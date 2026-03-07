@@ -107,7 +107,11 @@ label.flabel{display:block;font-size:.7rem;font-weight:700;color:var(--muted);te
 .toast.error{border-color:var(--red);color:var(--red);}
 
 /* ══ SIGNATURE ══ */
-.signature{text-align:center;padding:24px 0 10px;font-size:.9rem;font-weight:700;color:var(--muted);letter-spacing:.5px;}
+.signature{text-align:center;padding:24px 0 10px;font-weight:700;color:var(--muted);}
+.sig-line1{font-size:.92rem;letter-spacing:.5px;margin-bottom:4px;}
+.sig-line2{font-size:1.15rem;letter-spacing:2px;}
+.sig-letter{display:inline-block;animation:colorCycle 2.5s linear infinite;}
+@media(max-width:480px){.sig-line1{font-size:.78rem;}.sig-line2{font-size:1rem;}}
 .sig-letter{display:inline-block;animation:colorCycle 3s linear infinite;}
 @keyframes colorCycle{
   0%{color:#ff6b6b}12%{color:#ffa94d}25%{color:#ffd43b}
@@ -271,7 +275,7 @@ label.flabel{display:block;font-size:.7rem;font-weight:700;color:var(--muted);te
     <div class="settings-row">
       <div class="sf"><label class="flabel">حجم الصفحة</label><select class="fselect" id="pgSize"><option value="a4">A4</option><option value="a3">A3</option><option value="letter">Letter</option><option value="fit">مناسب للصورة</option></select></div>
       <div class="sf"><label class="flabel">الاتجاه</label><select class="fselect" id="pgOrient"><option value="portrait">عمودي</option><option value="landscape">أفقي</option><option value="auto">تلقائي</option></select></div>
-      <div class="sf"><label class="flabel">اسم الملف</label><input type="text" class="finput" id="pdfName" value="صوري"></div>
+      <div class="sf"><label class="flabel">اسم الملف</label><input type="text" class="finput" id="pdfName" value="Assignment"></div>
     </div>
     <div class="action-row">
       <div style="color:var(--muted);font-size:.85rem"><strong id="imgCount2" style="color:var(--text)">0</strong> صورة محددة</div>
@@ -285,7 +289,7 @@ label.flabel{display:block;font-size:.7rem;font-weight:700;color:var(--muted);te
       <div class="prog-bg"><div class="prog-fill" id="imgProgFill"></div></div>
     </div>
   </div>
-  <div class="signature">✦ AshrafTools ✦ بواسطة البشمهندس <span id="sig1"></span></div>
+  <div class="signature"><div class="sig-line1">✦ AshrafTools ✦ بواسطة البشمهندس</div><div class="sig-line2"><span id="sig1"></span></div></div>
 </div>
 
 <!-- ══ PAGE 2: JAVA MULTI-FILE ══ -->
@@ -359,7 +363,7 @@ public class Main {
     </div>
   </div>
 
-  <div class="signature">✦ AshrafTools ✦ بواسطة البشمهندس <span id="sig2"></span></div>
+  <div class="signature"><div class="sig-line1">✦ AshrafTools ✦ بواسطة البشمهندس</div><div class="sig-line2"><span id="sig2"></span></div></div>
 </div>
 
 <!-- ══ PAGE 3: CLASS DIAGRAM ══ -->
@@ -426,7 +430,7 @@ public class Main {
       </div>
     </div>
   </div>
-  <div class="signature">✦ AshrafTools ✦ بواسطة البشمهندس <span id="sig3"></span></div>
+  <div class="signature"><div class="sig-line1">✦ AshrafTools ✦ بواسطة البشمهندس</div><div class="sig-line2"><span id="sig3"></span></div></div>
 </div>
 
 <!-- ══ PAGE 4: FULL PROJECT ══ -->
@@ -505,7 +509,7 @@ public class Main {
     </div>
   </div>
 
-  <div class="signature">✦ AshrafTools ✦ بواسطة البشمهندس <span id="sig4"></span></div>
+  <div class="signature"><div class="sig-line1">✦ AshrafTools ✦ بواسطة البشمهندس</div><div class="sig-line2"><span id="sig4"></span></div></div>
 </div>
 
 <!-- ══ NEW FILE MODAL ══ -->
@@ -614,7 +618,7 @@ document.getElementById('convertPDF').addEventListener('click',async()=>{
   btn.disabled=true;prog.classList.add('show');
   try{
     const sz=document.getElementById('pgSize').value,or=document.getElementById('pgOrient').value,
-      nm=document.getElementById('pdfName').value.trim()||'صوري';
+      nm=document.getElementById('pdfName').value.trim()||'Assignment';
     let pdf=null;
     for(let i=0;i<imgs.length;i++){
       lbl.textContent=`معالجة ${i+1}/${imgs.length}...`;fill.style.width=(i/imgs.length*90)+'%';

@@ -8,30 +8,90 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, runTransaction, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import { getDatabase, ref, runTransaction, onValue, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
   const firebaseConfig = {
-    apiKey: "AIzaSyDemo-ReplaceWithYours",
-    authDomain: "ashraftools.firebaseapp.com",
-    databaseURL: "https://ashraftools-default-rtdb.firebaseio.com",
-    projectId: "ashraftools",
+    apiKey: "AIzaSyAX1b0UGjPgbX503SVS1cxv_LN2GJmqPjU",
+    authDomain: "project-824f0.firebaseapp.com",
+    databaseURL: "https://project-824f0-default-rtdb.firebaseio.com",
+    projectId: "project-824f0",
+    storageBucket: "project-824f0.firebasestorage.app",
+    messagingSenderId: "950408080300",
+    appId: "1:950408080300:web:c901f7d885fb1c920fe809"
   };
-  // نبدأ Firebase
+
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
-  const visitsRef = ref(db, 'visits');
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
 
-  // زود عداد لو أول زيارة في الجلسة
+  // ══ عداد الزيارات ══
+  const visitsRef = ref(db, 'visits');
   if(!sessionStorage.getItem('counted')){
     sessionStorage.setItem('counted','1');
     runTransaction(visitsRef, (current) => (current || 0) + 1);
   }
-
-  // اسمع على العداد واعرضه
   onValue(visitsRef, (snap) => {
     const el = document.getElementById('visitCount');
     if(el) el.textContent = (snap.val() || 0).toLocaleString('ar-EG');
   });
+
+  // ══ Google Login ══
+  window.loginWithGoogle = () => {
+    signInWithPopup(auth, provider).then(async (result) => {
+      const user = result.user;
+      const userSnap = await get(child(ref(db), 'users/' + user.uid));
+      if (!userSnap.exists()) {
+        await set(ref(db, 'users/' + user.uid), {
+          name: user.displayName,
+          email: user.email,
+          photo: user.photoURL || '',
+          points: 0,
+          solved: 0,
+          joinedAt: Date.now()
+        });
+      }
+    }).catch((err) => {
+      console.error("Login Error:", err);
+      showToast('❌ فشل تسجيل الدخول', 'error');
+    });
+  };
+
+  window.logoutUser = () => {
+    signOut(auth).then(() => {
+      showToast('👋 تم تسجيل الخروج', '');
+    });
+  };
+
+  // ══ تغيير شكل الزرار حسب الحالة ══
+  onAuthStateChanged(auth, (user) => {
+    const loginBtn = document.getElementById('loginBtn');
+    if (!loginBtn) return;
+    if (user) {
+      loginBtn.innerHTML = `
+        <img src="${user.photoURL || ''}" 
+          style="width:22px;height:22px;border-radius:50%;object-fit:cover;border:1px solid var(--border2);"
+          onerror="this.style.display='none'">
+        <span style="max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${user.displayName?.split(' ')[0] || 'مرحباً'}</span>
+        <span style="opacity:.5;font-size:.75rem;" onclick="event.stopPropagation();window.logoutUser()">✕</span>`;
+      loginBtn.onclick = null;
+      loginBtn.style.background = 'rgba(34,211,122,.12)';
+      loginBtn.style.borderColor = 'rgba(34,211,122,.3)';
+      loginBtn.style.color = 'var(--green)';
+      window._currentUser = user;
+    } else {
+      loginBtn.innerHTML = `🚀 دخول بجوجل`;
+      loginBtn.onclick = window.loginWithGoogle;
+      loginBtn.style.background = '';
+      loginBtn.style.borderColor = '';
+      loginBtn.style.color = '';
+      window._currentUser = null;
+    }
+  });
+
+  window._db = db;
+  window._ref = ref;
   window._firebaseReady = true;
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -288,7 +348,12 @@ label.flabel{display:block;font-size:.7rem;font-weight:700;color:var(--muted);te
   <button class="tab-btn" onclick="switchTab('project',this)">🚀 مشروع كامل → ZIP</button>
   <button class="tab-btn" onclick="switchTab('guide',this)" style="color:var(--orange);border-bottom-color:transparent;">📖 دليل الاستخدام</button>
   <button class="tab-btn" onclick="switchTab('keys',this)" style="color:var(--cyan);border-bottom-color:transparent;">⌨️ الاختصارات</button>
-  <div style="margin-right:auto;display:flex;align-items:center;gap:6px;padding:0 16px;flex-shrink:0;border-right:1px solid var(--border);margin-right:0;">
+  <button id="loginBtn" class="btn btn-primary" onclick="loginWithGoogle()"
+    style="margin-right:auto;margin-left:8px;flex-shrink:0;padding:7px 14px;font-size:.8rem;">
+    🚀 دخول بجوجل
+  </button>
+  <div style="display:flex;align-items:center;gap:6px;padding:0 16px;flex-shrink:0;border-right:1px solid var(--border);">
+
     <span style="font-size:1rem;">👁️</span>
     <div style="display:flex;flex-direction:column;line-height:1.2;">
       <span id="visitCount" style="font-size:1rem;font-weight:900;color:var(--blue);font-family:var(--font-mono);">...</span>
@@ -1677,18 +1742,12 @@ document.getElementById('exportZipBtn').addEventListener('click',async()=>{
   finally{btn.disabled=false;await sleep(800);prog.classList.remove('show');fill.style.width='0%';}
 });
 
-/* ══ VISITOR TRACKER + COUNTER ══ */
+/* ══ VISITOR TRACKER ══ */
 async function trackVisit(){
-  // عداد محلي
-  let count = parseInt(localStorage.getItem('ashraf_visits')||'0') + 1;
-  localStorage.setItem('ashraf_visits', count);
-  document.getElementById('visitCount').textContent = count;
-
   // بعت إيميل لأشرف بس لو أول زيارة في الجلسة دي
   if(sessionStorage.getItem('visited'))return;
   sessionStorage.setItem('visited','1');
 
-  // معلومات الزيارة
   const now = new Date();
   const timeStr = now.toLocaleString('ar-EG',{timeZone:'Africa/Cairo'});
   const ua = navigator.userAgent;

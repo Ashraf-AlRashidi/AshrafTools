@@ -112,6 +112,7 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);min-heigh
 .finput{width:100%;padding:9px 13px;background:var(--surface2);border:1px solid var(--border2);
   border-radius:8px;color:var(--text);font-family:var(--font-ui);font-size:.88rem;outline:none;transition:border-color .2s;}
 .finput:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-glow);}
+.code-editor::placeholder{color:#3a5068;font-family:var(--font-mono);line-height:1.75;}
 .finput::placeholder{color:var(--muted);}
 .fselect{width:100%;padding:9px 13px;background:var(--surface2);border:1px solid var(--border2);
   border-radius:8px;color:var(--text);font-family:var(--font-ui);font-size:.88rem;outline:none;}
@@ -285,6 +286,8 @@ label.flabel{display:block;font-size:.7rem;font-weight:700;color:var(--muted);te
   </button>
   <button class="tab-btn" onclick="switchTab('diagram',this)">📊 Class Diagram</button>
   <button class="tab-btn" onclick="switchTab('project',this)">🚀 مشروع كامل → ZIP</button>
+  <button class="tab-btn" onclick="switchTab('guide',this)" style="color:var(--orange);border-bottom-color:transparent;">📖 دليل الاستخدام</button>
+  <button class="tab-btn" onclick="switchTab('keys',this)" style="color:var(--cyan);border-bottom-color:transparent;">⌨️ الاختصارات</button>
   <div style="margin-right:auto;display:flex;align-items:center;gap:6px;padding:0 16px;flex-shrink:0;border-right:1px solid var(--border);margin-right:0;">
     <span style="font-size:1rem;">👁️</span>
     <div style="display:flex;flex-direction:column;line-height:1.2;">
@@ -374,12 +377,20 @@ label.flabel{display:block;font-size:.7rem;font-weight:700;color:var(--muted);te
       <button class="btn btn-ghost btn-sm" id="copyCodeBtn">📋</button>
     </div>
     <textarea class="code-editor" id="codeEditor" spellcheck="false"
-placeholder="// اكتب كودك هنا...
-public class Main {
-    public static void main(String[] args) {
-        System.out.println(&quot;Hello, AshrafTools!&quot;);
-    }
-}"></textarea>
+placeholder="// 👋 أهلاً يا بشمهندس!
+//
+// 😩 المشكلة اللي بتحصل معاك:
+//    لما يكون عندك Assignment فيه Main + كلاسات تانية
+//    بتبقى مش عارف تجمعهم في مكان واحد وتسلمهم!
+//
+// ✅ الحل هنا:
+//    ① خد الكود بتاع Main → Ctrl+A ثم Ctrl+C
+//    ② Ctrl+V هنا وابدأ الشغل
+//
+//    ③ عايز كلاس تاني؟ اضغط &quot;+ ملف جديد&quot; فوق
+//    ④ لما تخلص → &quot;📦 تنزيل كـ ZIP&quot; وسلّمه!
+//
+// ابدأ اكتب وهيتمسح الكلام ده تلقائي 👇"></textarea>
     <div class="preview-box" id="codePreview"></div>
   </div>
 
@@ -560,7 +571,505 @@ public class Main {
   <div class="signature"><div class="sig-line1">✦ AshrafTools ✦ بواسطة البشمهندس</div><div class="sig-line2"><span id="sig4"></span></div></div>
 </div>
 
-<!-- ══ NEW FILE MODAL ══ -->
+<!-- ══ PAGE 5: GUIDE ══ -->
+<div id="page-guide" class="page">
+  <div class="page-header">
+    <div class="page-icon orange">📖</div>
+    <div>
+      <div class="page-title">دليل الاستخدام</div>
+      <div class="page-sub">كل حاجة محتاج تعرفها عن AshrafTools في مكان واحد</div>
+    </div>
+  </div>
+
+  <!-- Quick Nav -->
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px;">
+    <a href="#g1" style="text-decoration:none"><span class="btn btn-ghost btn-sm">🖼️ صور → PDF</span></a>
+    <a href="#g2" style="text-decoration:none"><span class="btn btn-ghost btn-sm">☕ Java Editor</span></a>
+    <a href="#g3" style="text-decoration:none"><span class="btn btn-ghost btn-sm">📊 Class Diagram</span></a>
+    <a href="#g4" style="text-decoration:none"><span class="btn btn-ghost btn-sm">🚀 مشروع ZIP</span></a>
+  </div>
+
+  <!-- ═══ TOOL 1 ═══ -->
+  <div id="g1" class="card" style="border-right:4px solid var(--blue);margin-bottom:24px;">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+      <div class="page-icon blue" style="width:52px;height:52px;font-size:1.6rem;flex-shrink:0;">🖼️</div>
+      <div>
+        <div style="font-size:1.2rem;font-weight:900;">أداة صور → PDF</div>
+        <div style="color:var(--muted);font-size:.85rem;">حوّل صورك لـ PDF احترافي في ثوانٍ</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+      <div style="background:rgba(34,211,122,.06);border:1px solid rgba(34,211,122,.2);border-radius:10px;padding:14px;">
+        <div style="font-weight:900;color:var(--green);margin-bottom:8px;">✅ الاستخدام</div>
+        <div style="font-size:.84rem;color:var(--muted);line-height:2;">
+          • طلبات ترقيم الصفحات في المشاريع<br>
+          • تحويل صور الشيتات لملف PDF واحد<br>
+          • تجميع صور الـ Assignment في ملف
+        </div>
+      </div>
+      <div style="background:rgba(79,142,247,.06);border:1px solid rgba(79,142,247,.2);border-radius:10px;padding:14px;">
+        <div style="font-weight:900;color:var(--blue);margin-bottom:8px;">💡 الفايدة</div>
+        <div style="font-size:.84rem;color:var(--muted);line-height:2;">
+          • بدل ما تستخدم مواقع تانية بيجي إعلانات<br>
+          • بيشتغل من غير نت بعد ما يتفتح<br>
+          • مفيش حد بيشوف صورك — كل حاجة على جهازك
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--surface2);border-radius:10px;padding:16px;">
+      <div style="font-weight:900;margin-bottom:12px;font-size:.85rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">🪜 خطوات الاستخدام</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="background:var(--blue);color:white;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.75rem;font-weight:900;flex-shrink:0;">١</span>
+          <div style="font-size:.85rem;line-height:1.7;">اسحب الصور جوا المربع أو اضغط <strong style="color:var(--blue)">"+ اختر صور"</strong> — بيقبل PNG وJPG وWEBP وGIF</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="background:var(--blue);color:white;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.75rem;font-weight:900;flex-shrink:0;">٢</span>
+          <div style="font-size:.85rem;line-height:1.7;">رتّب الصور بالسحب — الرقم اللي على كل صورة هو ترتيبها في الـ PDF</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="background:var(--blue);color:white;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.75rem;font-weight:900;flex-shrink:0;">٣</span>
+          <div style="font-size:.85rem;line-height:1.7;">اختار <strong>حجم الصفحة</strong> (A4 للطباعة العادية) و<strong>الاتجاه</strong> (تلقائي بيختار الأنسب لكل صورة)</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="background:var(--blue);color:white;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.75rem;font-weight:900;flex-shrink:0;">٤</span>
+          <div style="font-size:.85rem;line-height:1.7;">غيّر اسم الملف واضغط <strong style="color:var(--blue)">"⚡ تحويل إلى PDF"</strong> — هينزل تلقائي</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:8px;padding:12px;margin-top:14px;font-size:.83rem;">
+      <strong style="color:var(--orange);">💡 نصيحة:</strong> <span style="color:var(--muted);">اختار "مناسب للصورة" في حجم الصفحة لو عايز كل صفحة بحجم صورتها بالظبط</span>
+    </div>
+  </div>
+
+  <!-- ═══ TOOL 2 ═══ -->
+  <div id="g2" class="card" style="border-right:4px solid var(--green);margin-bottom:24px;">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+      <div class="page-icon green" style="width:52px;height:52px;font-size:1.6rem;flex-shrink:0;">☕</div>
+      <div>
+        <div style="font-size:1.2rem;font-weight:900;">Java Project Editor</div>
+        <div style="color:var(--muted);font-size:.85rem;">اكتب كلاسات متعددة وصدّرهم ZIP جاهز للـ IDE</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+      <div style="background:rgba(34,211,122,.06);border:1px solid rgba(34,211,122,.2);border-radius:10px;padding:14px;">
+        <div style="font-weight:900;color:var(--green);margin-bottom:8px;">✅ الاستخدام</div>
+        <div style="font-size:.84rem;color:var(--muted);line-height:2;">
+          • كتابة مشاريع OOP متعددة الكلاسات<br>
+          • مراجعة الكود قبل ما تفتح الـ IDE<br>
+          • تجميع ملفات المشروع بسرعة
+        </div>
+      </div>
+      <div style="background:rgba(34,211,122,.06);border:1px solid rgba(34,211,122,.2);border-radius:10px;padding:14px;">
+        <div style="font-weight:900;color:var(--green);margin-bottom:8px;">💡 الفايدة</div>
+        <div style="font-size:.84rem;color:var(--muted);line-height:2;">
+          • ZIP جاهز تفتحه على IntelliJ مباشرة<br>
+          • Snippets جاهزة توفر وقت الكتابة<br>
+          • ألوان Syntax تساعدك تراجع الكود
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:14px;">
+      <div style="font-weight:900;margin-bottom:12px;font-size:.85rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">🪜 خطوات الاستخدام</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="background:var(--green);color:#050d0a;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.75rem;font-weight:900;flex-shrink:0;">١</span>
+          <div style="font-size:.85rem;line-height:1.7;">في الـ tab الأولاني <strong style="color:var(--green)">Main.java</strong> — ابدأ اكتب الكود. Tab بيعمل 4 مسافات تلقائي</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="background:var(--green);color:#050d0a;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.75rem;font-weight:900;flex-shrink:0;">٢</span>
+          <div style="font-size:.85rem;line-height:1.7;">اضغط <strong style="color:var(--green)">"+ ملف جديد"</strong> — هيسألك اسم الكلاس وهيعمل template تلقائي باسمه</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="background:var(--green);color:#050d0a;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.75rem;font-weight:900;flex-shrink:0;">٣</span>
+          <div style="font-size:.85rem;line-height:1.7;">استخدم <strong style="color:var(--green)">⚡ Snippets</strong> — اضغط على أي snippet زي ArrayList أو Try-Catch وهيتضاف في الـ editor فوراً</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="background:var(--green);color:#050d0a;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.75rem;font-weight:900;flex-shrink:0;">٤</span>
+          <div style="font-size:.85rem;line-height:1.7;">اضغط <strong style="color:var(--blue)">"📦 تنزيل كـ ZIP"</strong> — هينزل ملف فيه كل الكلاسات جوا فولدر src</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:rgba(166,108,255,.06);border:1px solid rgba(166,108,255,.2);border-radius:8px;padding:12px;font-size:.83rem;">
+      <strong style="color:var(--purple);">📌 الـ Snippets الموجودة:</strong>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">
+        <span style="background:var(--surface2);padding:3px 10px;border-radius:5px;font-size:.78rem;font-family:var(--font-mono);">Hello World</span>
+        <span style="background:var(--surface2);padding:3px 10px;border-radius:5px;font-size:.78rem;font-family:var(--font-mono);">For Loop</span>
+        <span style="background:var(--surface2);padding:3px 10px;border-radius:5px;font-size:.78rem;font-family:var(--font-mono);">ArrayList</span>
+        <span style="background:var(--surface2);padding:3px 10px;border-radius:5px;font-size:.78rem;font-family:var(--font-mono);">Scanner</span>
+        <span style="background:var(--surface2);padding:3px 10px;border-radius:5px;font-size:.78rem;font-family:var(--font-mono);">Class Template</span>
+        <span style="background:var(--surface2);padding:3px 10px;border-radius:5px;font-size:.78rem;font-family:var(--font-mono);">Try-Catch</span>
+        <span style="background:var(--surface2);padding:3px 10px;border-radius:5px;font-size:.78rem;font-family:var(--font-mono);">Interface</span>
+        <span style="background:var(--surface2);padding:3px 10px;border-radius:5px;font-size:.78rem;font-family:var(--font-mono);">Bubble Sort</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TOOL 3 ═══ -->
+  <div id="g3" class="card" style="border-right:4px solid var(--purple);margin-bottom:24px;">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+      <div class="page-icon purple" style="width:52px;height:52px;font-size:1.6rem;flex-shrink:0;">📊</div>
+      <div>
+        <div style="font-size:1.2rem;font-weight:900;">Class Diagram Builder</div>
+        <div style="color:var(--muted);font-size:.85rem;">ارسم خريطة الكلاسات وعلاقاتها واحفظها PDF</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+      <div style="background:rgba(166,108,255,.06);border:1px solid rgba(166,108,255,.2);border-radius:10px;padding:14px;">
+        <div style="font-weight:900;color:var(--purple);margin-bottom:8px;">✅ الاستخدام</div>
+        <div style="font-size:.84rem;color:var(--muted);line-height:2;">
+          • تصميم مشاريع OOP قبل الكتابة<br>
+          • شرح العلاقات بين الكلاسات<br>
+          • تسليم الـ Design مع المشروع
+        </div>
+      </div>
+      <div style="background:rgba(166,108,255,.06);border:1px solid rgba(166,108,255,.2);border-radius:10px;padding:14px;">
+        <div style="font-weight:900;color:var(--purple);margin-bottom:8px;">💡 الفايدة</div>
+        <div style="font-size:.84rem;color:var(--muted);line-height:2;">
+          • بديل سريع لـ draw.io وLucidchart<br>
+          • بيحفظ PDF جاهز للتسليم<br>
+          • كل كلاس بلون مختلف عشان يتميز
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:14px;">
+      <div style="font-weight:900;margin-bottom:12px;font-size:.85rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">🪜 خطوات الاستخدام</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="background:var(--purple);color:white;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.75rem;font-weight:900;flex-shrink:0;">١</span>
+          <div style="font-size:.85rem;line-height:1.7;">اكتب اسم الكلاس الأولاني في خانة <strong style="color:var(--purple)">"اسم الكلاس"</strong></div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="background:var(--purple);color:white;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.75rem;font-weight:900;flex-shrink:0;">٢</span>
+          <div style="font-size:.85rem;line-height:1.7;">ضيف <strong>Attributes</strong> — اختار الـ visibility (+/-/#) واكتب اسم المتغير زي <code style="background:var(--surface3);padding:1px 6px;border-radius:4px;font-family:var(--font-mono);">String name</code> واضغط Enter</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="background:var(--purple);color:white;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.75rem;font-weight:900;flex-shrink:0;">٣</span>
+          <div style="font-size:.85rem;line-height:1.7;">ضيف <strong>Methods</strong> بنفس الطريقة زي <code style="background:var(--surface3);padding:1px 6px;border-radius:4px;font-family:var(--font-mono);">void study()</code></div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="background:var(--purple);color:white;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.75rem;font-weight:900;flex-shrink:0;">٤</span>
+          <div style="font-size:.85rem;line-height:1.7;">اضغط <strong style="color:var(--green)">"+ كلاس"</strong> لإضافة كلاس جديد — هيسألك الاسم</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="background:var(--purple);color:white;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.75rem;font-weight:900;flex-shrink:0;">٥</span>
+          <div style="font-size:.85rem;line-height:1.7;">في قسم <strong>"علاقة بين كلاسين"</strong> — اختار FROM وTO ونوع العلاقة واضغط تحديث</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="background:var(--purple);color:white;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.75rem;font-weight:900;flex-shrink:0;">٦</span>
+          <div style="font-size:.85rem;line-height:1.7;">اضغط <strong style="color:var(--orange)">"💾 حفظ PDF"</strong> لتنزيل الـ Diagram</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Relation types -->
+    <div style="background:var(--surface2);border-radius:10px;padding:16px;">
+      <div style="font-weight:900;margin-bottom:12px;font-size:.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">🔗 أنواع العلاقات</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div style="font-size:.82rem;padding:8px;background:var(--surface3);border-radius:7px;">
+          <strong style="color:var(--blue);">Association</strong> ─────<br>
+          <span style="color:var(--muted);">علاقة عادية بين كلاسين</span>
+        </div>
+        <div style="font-size:.82rem;padding:8px;background:var(--surface3);border-radius:7px;">
+          <strong style="color:var(--green);">Inheritance</strong> ◁─────<br>
+          <span style="color:var(--muted);">كلاس بيرث من كلاس تاني</span>
+        </div>
+        <div style="font-size:.82rem;padding:8px;background:var(--surface3);border-radius:7px;">
+          <strong style="color:var(--purple);">Implements</strong> ◁- - -<br>
+          <span style="color:var(--muted);">بينفذ Interface</span>
+        </div>
+        <div style="font-size:.82rem;padding:8px;background:var(--surface3);border-radius:7px;">
+          <strong style="color:var(--orange);">Aggregation</strong> ◇─────<br>
+          <span style="color:var(--muted);">has-a علاقة ضعيفة</span>
+        </div>
+        <div style="font-size:.82rem;padding:8px;background:var(--surface3);border-radius:7px;">
+          <strong style="color:var(--red);">Composition</strong> ◆─────<br>
+          <span style="color:var(--muted);">has-a علاقة قوية</span>
+        </div>
+        <div style="font-size:.82rem;padding:8px;background:var(--surface3);border-radius:7px;">
+          <strong style="color:var(--cyan);">Dependency</strong> - - - →<br>
+          <span style="color:var(--muted);">uses علاقة مؤقتة</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TOOL 4 ═══ -->
+  <div id="g4" class="card" style="border-right:4px solid var(--orange);margin-bottom:24px;">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+      <div class="page-icon orange" style="width:52px;height:52px;font-size:1.6rem;flex-shrink:0;">🚀</div>
+      <div>
+        <div style="font-size:1.2rem;font-weight:900;">مشروع كامل → ZIP</div>
+        <div style="color:var(--muted);font-size:.85rem;">صدّر كل حاجة في ملف ZIP واحد</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+      <div style="background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:10px;padding:14px;">
+        <div style="font-weight:900;color:var(--orange);margin-bottom:8px;">✅ الاستخدام</div>
+        <div style="font-size:.84rem;color:var(--muted);line-height:2;">
+          • تسليم المشروع كاملاً في ملف واحد<br>
+          • رفع المشروع على IDE بدون تعب<br>
+          • حفظ نسخة من الشغل كله
+        </div>
+      </div>
+      <div style="background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:10px;padding:14px;">
+        <div style="font-weight:900;color:var(--orange);margin-bottom:8px;">📦 محتوى الـ ZIP</div>
+        <div style="font-size:.84rem;color:var(--muted);line-height:2;">
+          📁 src/ ← ملفات Java<br>
+          🖼️ ClassDiagram.png<br>
+          🖼️ images/ ← لو ضفت صور<br>
+          📄 README.md
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--surface2);border-radius:10px;padding:16px;">
+      <div style="font-weight:900;margin-bottom:12px;font-size:.85rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">🪜 خطوات الاستخدام</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="background:var(--orange);color:#0a0600;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.75rem;font-weight:900;flex-shrink:0;">١</span>
+          <div style="font-size:.85rem;line-height:1.7;">تأكد إنك كتبت الكود في Java Editor وعملت الـ Diagram</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="background:var(--orange);color:#0a0600;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.75rem;font-weight:900;flex-shrink:0;">٢</span>
+          <div style="font-size:.85rem;line-height:1.7;">افتح صفحة <strong>"🚀 مشروع كامل"</strong> — هتلاقي ملخص لكل حاجة عندك</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="background:var(--orange);color:#0a0600;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.75rem;font-weight:900;flex-shrink:0;">٣</span>
+          <div style="font-size:.85rem;line-height:1.7;">اختار إيه اللي تحطه في الـ ZIP — ✅ Diagram و✅ صور</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="background:var(--orange);color:#0a0600;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:.75rem;font-weight:900;flex-shrink:0;">٤</span>
+          <div style="font-size:.85rem;line-height:1.7;">اكتب اسم المشروع واضغط <strong style="color:var(--blue)">"📦 تصدير كـ ZIP كامل"</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tips -->
+  <div class="card" style="background:rgba(79,142,247,.04);border-color:rgba(79,142,247,.25);margin-bottom:24px;">
+    <div style="font-size:1rem;font-weight:900;margin-bottom:16px;">⚡ نصايح سريعة</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;">
+      <div style="background:var(--surface2);border-radius:9px;padding:12px;font-size:.83rem;line-height:1.7;">
+        <div style="font-weight:900;color:var(--blue);margin-bottom:4px;">⌨️ اختصارات الـ Editor</div>
+        <div style="color:var(--muted);">Tab → 4 مسافات<br>Enter في خانة الـ Attribute → يضيفه تلقائي</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:9px;padding:12px;font-size:.83rem;line-height:1.7;">
+        <div style="font-weight:900;color:var(--green);margin-bottom:4px;">📱 شغال على الموبايل</div>
+        <div style="color:var(--muted);">الموقع Responsive — يشتغل من أي جهاز أو موبايل</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:9px;padding:12px;font-size:.83rem;line-height:1.7;">
+        <div style="font-weight:900;color:var(--orange);margin-bottom:4px;">💾 الحفظ التلقائي</div>
+        <div style="color:var(--muted);">الكود بيتحفظ في الـ tab — لو بدّلت تاب وراجعت هتلاقيه موجود</div>
+      </div>
+      <div style="background:var(--surface2);border-radius:9px;padding:12px;font-size:.83rem;line-height:1.7;">
+        <div style="font-weight:900;color:var(--purple);margin-bottom:4px;">🎨 ألوان الكود</div>
+        <div style="color:var(--muted);">اضغط "👁️ ألوان الكود" لتفعيل Syntax Highlighting وتراجع كودك بسهولة</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="signature"><div class="sig-line1">✦ AshrafTools ✦ بواسطة البشمهندس</div><div class="sig-line2"><span id="sig5"></span></div></div>
+</div>
+
+<!-- ══ PAGE 6: KEYBOARD SHORTCUTS ══ -->
+<div id="page-keys" class="page">
+  <div class="page-header">
+    <div class="page-icon" style="background:rgba(0,229,212,.1);border:1px solid rgba(0,229,212,.3);width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font-size:1.5rem;flex-shrink:0;">⌨️</div>
+    <div>
+      <div class="page-title">اختصارات الكيبورد</div>
+      <div class="page-sub">كل الاختصارات اللي هتوفرلك وقت وتخليك شغال أسرع</div>
+    </div>
+  </div>
+
+  <style>
+    .key{display:inline-flex;align-items:center;justify-content:center;
+      background:var(--surface3);border:1px solid var(--border2);
+      border-bottom:3px solid var(--border2);border-radius:7px;
+      font-family:var(--font-mono);font-size:.78rem;font-weight:700;
+      color:var(--text);padding:4px 10px;white-space:nowrap;line-height:1;}
+    .key.blue{border-color:rgba(79,142,247,.5);border-bottom-color:var(--blue);color:var(--blue);background:rgba(79,142,247,.08);}
+    .key.green{border-color:rgba(34,211,122,.5);border-bottom-color:var(--green);color:var(--green);background:rgba(34,211,122,.08);}
+    .key.orange{border-color:rgba(245,166,35,.5);border-bottom-color:var(--orange);color:var(--orange);background:rgba(245,166,35,.08);}
+    .key.purple{border-color:rgba(166,108,255,.5);border-bottom-color:var(--purple);color:var(--purple);background:rgba(166,108,255,.08);}
+    .key.cyan{border-color:rgba(0,229,212,.5);border-bottom-color:var(--cyan);color:var(--cyan);background:rgba(0,229,212,.08);}
+    .key-plus{color:var(--muted);font-size:.8rem;margin:0 4px;}
+    .shortcut-row{display:flex;align-items:center;gap:14px;padding:13px 16px;
+      border-radius:10px;transition:background .15s;}
+    .shortcut-row:hover{background:var(--surface2);}
+    .shortcut-keys{display:flex;align-items:center;flex-shrink:0;min-width:160px;flex-wrap:wrap;gap:4px;}
+    .shortcut-desc{font-size:.88rem;color:var(--text);line-height:1.5;}
+    .shortcut-desc small{display:block;color:var(--muted);font-size:.76rem;margin-top:2px;}
+    .section-title{font-size:.7rem;font-weight:900;text-transform:uppercase;letter-spacing:2px;
+      color:var(--muted);padding:8px 16px 6px;margin-top:8px;}
+  </style>
+
+  <!-- ═══ GENERAL ═══ -->
+  <div class="card" style="padding:8px;margin-bottom:20px;">
+    <div class="section-title">🌐 عام — بيشتغل في أي مكان</div>
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key cyan">Ctrl</span><span class="key-plus">+</span><span class="key cyan">1</span></div>
+      <div class="shortcut-desc">فتح صفحة صور → PDF<small>روح على الأداة الأولى مباشرة</small></div>
+    </div>
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key cyan">Ctrl</span><span class="key-plus">+</span><span class="key cyan">2</span></div>
+      <div class="shortcut-desc">فتح Java Editor<small>روح على محرر الكود مباشرة</small></div>
+    </div>
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key cyan">Ctrl</span><span class="key-plus">+</span><span class="key cyan">3</span></div>
+      <div class="shortcut-desc">فتح Class Diagram<small>روح على رسام الـ Diagram مباشرة</small></div>
+    </div>
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key cyan">Ctrl</span><span class="key-plus">+</span><span class="key cyan">4</span></div>
+      <div class="shortcut-desc">فتح مشروع كامل ZIP<small>روح على صفحة التصدير مباشرة</small></div>
+    </div>
+  </div>
+
+  <!-- ═══ JAVA EDITOR ═══ -->
+  <div class="card" style="padding:8px;margin-bottom:20px;">
+    <div class="section-title">☕ Java Editor — اختصارات الكتابة</div>
+
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key blue">Tab</span></div>
+      <div class="shortcut-desc">إضافة 4 مسافات (Indent)<small>بدل ما تضغط Space 4 مرات</small></div>
+    </div>
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key blue">Ctrl</span><span class="key-plus">+</span><span class="key blue">A</span></div>
+      <div class="shortcut-desc">تحديد كل الكود<small>تحديد كل محتوى الـ editor دفعة واحدة</small></div>
+    </div>
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key blue">Ctrl</span><span class="key-plus">+</span><span class="key blue">C</span></div>
+      <div class="shortcut-desc">نسخ الكود المحدد<small>انسخ الكود بعد ما تعمل Ctrl+A</small></div>
+    </div>
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key blue">Ctrl</span><span class="key-plus">+</span><span class="key blue">V</span></div>
+      <div class="shortcut-desc">لصق الكود<small>ألصق الكود اللي نسخته من IDE أو من أي مكان</small></div>
+    </div>
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key blue">Ctrl</span><span class="key-plus">+</span><span class="key blue">X</span></div>
+      <div class="shortcut-desc">قص الكود المحدد<small>بيشيل الكود ويحطه في الـ Clipboard</small></div>
+    </div>
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key blue">Ctrl</span><span class="key-plus">+</span><span class="key blue">Z</span></div>
+      <div class="shortcut-desc">تراجع عن آخر تعديل (Undo)<small>لو غلطت في حاجة ارجع للخطوة اللي فاتت</small></div>
+    </div>
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key blue">Ctrl</span><span class="key-plus">+</span><span class="key blue">Y</span></div>
+      <div class="shortcut-desc">إعادة آخر تعديل (Redo)<small>إعادة الحاجة اللي عملت Undo عليها</small></div>
+    </div>
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key blue">Ctrl</span><span class="key-plus">+</span><span class="key blue">F</span></div>
+      <div class="shortcut-desc">بحث في الصفحة<small>دور على كلمة أو كود معين جوا الـ editor</small></div>
+    </div>
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key green">Enter</span></div>
+      <div class="shortcut-desc">إضافة Attribute أو Method<small>في خانات الإضافة بيحفظ ويضيف تلقائي من غير ما تضغط الزرار</small></div>
+    </div>
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key orange">Ctrl</span><span class="key-plus">+</span><span class="key orange">S</span></div>
+      <div class="shortcut-desc">حفظ الصفحة (المتصفح)<small>ممكن تستخدمه لحفظ الـ HTML لو على جهازك</small></div>
+    </div>
+  </div>
+
+  <!-- ═══ BROWSER ═══ -->
+  <div class="card" style="padding:8px;margin-bottom:20px;">
+    <div class="section-title">🌍 المتصفح — اختصارات مفيدة</div>
+
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key purple">F5</span></div>
+      <div class="shortcut-desc">تحديث الصفحة<small>ملحوظة: الكود هيتمسح — احفظه الأول!</small></div>
+    </div>
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key purple">Ctrl</span><span class="key-plus">+</span><span class="key purple">R</span></div>
+      <div class="shortcut-desc">تحديث الصفحة (بديل F5)<small>نفس تأثير F5</small></div>
+    </div>
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key purple">Ctrl</span><span class="key-plus">+</span><span class="key purple">+</span></div>
+      <div class="shortcut-desc">تكبير عرض الصفحة<small>لو الكتابة صغيرة كبّرها</small></div>
+    </div>
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key purple">Ctrl</span><span class="key-plus">+</span><span class="key purple">-</span></div>
+      <div class="shortcut-desc">تصغير عرض الصفحة<small>لو عايز تشوف أكتر على الشاشة</small></div>
+    </div>
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key purple">Ctrl</span><span class="key-plus">+</span><span class="key purple">0</span></div>
+      <div class="shortcut-desc">إعادة الحجم الطبيعي<small>ارجع للحجم الافتراضي 100%</small></div>
+    </div>
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key purple">F11</span></div>
+      <div class="shortcut-desc">ملء الشاشة (Fullscreen)<small>تخفي الـ toolbar وتشتغل على شاشة كاملة</small></div>
+    </div>
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key purple">Ctrl</span><span class="key-plus">+</span><span class="key purple">P</span></div>
+      <div class="shortcut-desc">طباعة أو حفظ كـ PDF<small>تقدر تحفظ الصفحة كـ PDF من المتصفح</small></div>
+    </div>
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key purple">Ctrl</span><span class="key-plus">+</span><span class="key purple">D</span></div>
+      <div class="shortcut-desc">إضافة الموقع للمفضلة<small>احفظ الموقع عندك عشان ترجعله بسرعة</small></div>
+    </div>
+  </div>
+
+  <!-- ═══ TEXT EDITING ═══ -->
+  <div class="card" style="padding:8px;margin-bottom:20px;">
+    <div class="section-title">✍️ تحرير النصوص — اختصارات متقدمة</div>
+
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key">Home</span></div>
+      <div class="shortcut-desc">الذهاب لأول السطر<small>المؤشر يروح لأول الـ line اللي انت فيها</small></div>
+    </div>
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key">End</span></div>
+      <div class="shortcut-desc">الذهاب لآخر السطر<small>المؤشر يروح لآخر الـ line اللي انت فيها</small></div>
+    </div>
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key">Ctrl</span><span class="key-plus">+</span><span class="key">Home</span></div>
+      <div class="shortcut-desc">الذهاب لأول الكود كله<small>روح لأول سطر في الـ editor</small></div>
+    </div>
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key">Ctrl</span><span class="key-plus">+</span><span class="key">End</span></div>
+      <div class="shortcut-desc">الذهاب لآخر الكود كله<small>روح لآخر سطر في الـ editor</small></div>
+    </div>
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key">Shift</span><span class="key-plus">+</span><span class="key">↑↓</span></div>
+      <div class="shortcut-desc">تحديد أسطر بالأسهم<small>اضغط Shift واستخدم الأسهم لتحديد سطر سطر</small></div>
+    </div>
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key">Ctrl</span><span class="key-plus">+</span><span class="key">Shift</span><span class="key-plus">+</span><span class="key">K</span></div>
+      <div class="shortcut-desc">حذف سطر كامل<small>يشيل السطر اللي المؤشر عليه بدون ما تحدده</small></div>
+    </div>
+    <div class="shortcut-row">
+      <div class="shortcut-keys"><span class="key">Ctrl</span><span class="key-plus">+</span><span class="key">← →</span></div>
+      <div class="shortcut-desc">التنقل كلمة كلمة<small>المؤشر يتحرك كلمة كاملة مش حرف حرف</small></div>
+    </div>
+  </div>
+
+  <!-- tip -->
+  <div class="card" style="background:rgba(0,229,212,.04);border-color:rgba(0,229,212,.2);margin-bottom:24px;">
+    <div style="font-size:.88rem;line-height:2;color:var(--muted);">
+      <strong style="color:var(--cyan);display:block;margin-bottom:6px;">💡 نصيحة ذهبية</strong>
+      الاختصار الأهم لطالب هندسة هو:<br>
+      <span class="key blue">Ctrl</span><span class="key-plus" style="margin:0 6px">+</span><span class="key blue">A</span>
+      <span class="key-plus" style="margin:0 6px">ثم</span>
+      <span class="key blue">Ctrl</span><span class="key-plus" style="margin:0 6px">+</span><span class="key blue">C</span>
+      <span class="key-plus" style="margin:0 6px">ثم</span>
+      <span class="key blue">Ctrl</span><span class="key-plus" style="margin:0 6px">+</span><span class="key blue">V</span>
+      <br><br>
+      خد الكود بتاعك من الـ IDE → الصقه هنا → نزّل ZIP ✅
+    </div>
+  </div>
+
+  <div class="signature"><div class="sig-line1">✦ AshrafTools ✦ بواسطة البشمهندس</div><div class="sig-line2"><span id="sig6"></span></div></div>
+</div>
+
 <div id="newFileModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);
   z-index:500;backdrop-filter:blur(6px);place-items:center;align-items:center;justify-content:center;">
   <div style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;
@@ -605,7 +1114,7 @@ function makeSig(id){
   const el=document.getElementById(id);if(!el)return;
   el.innerHTML=[...NAME].map((c,i)=>`<span class="sig-letter" style="animation-delay:${i*.18}s">${c}</span>`).join('');
 }
-['sig1','sig2','sig3','sig4'].forEach(makeSig);
+['sig1','sig2','sig3','sig4','sig5','sig6'].forEach(makeSig);
 
 /* ══ TAB SWITCH ══ */
 function switchTab(id,btn){
@@ -616,6 +1125,16 @@ function switchTab(id,btn){
   if(id==='diagram')setTimeout(()=>{resizeCv();drawDiagram();},60);
   if(id==='project')setTimeout(refreshProjectPage,80);
 }
+
+// اختصارات Ctrl+1..4 للتنقل بين الصفحات
+document.addEventListener('keydown',e=>{
+  if(!e.ctrlKey)return;
+  const tabs=document.querySelectorAll('.tab-btn');
+  if(e.key==='1'){e.preventDefault();switchTab('img',tabs[0]);}
+  else if(e.key==='2'){e.preventDefault();switchTab('code',tabs[1]);}
+  else if(e.key==='3'){e.preventDefault();switchTab('diagram',tabs[2]);}
+  else if(e.key==='4'){e.preventDefault();switchTab('project',tabs[3]);}
+});
 
 /* ══════════════════════════════════
    PAGE 1: IMAGES → PDF
@@ -693,7 +1212,7 @@ document.getElementById('convertPDF').addEventListener('click',async()=>{
    PAGE 2: MULTI-FILE JAVA EDITOR
 ══════════════════════════════════ */
 // Each file: {name, code}
-let javaFiles=[{name:'Main',code:'public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, AshrafTools!");\n    }\n}'}];
+let javaFiles=[{name:'Main',code:''}];
 let activeFileIdx=0;
 
 function renderFileTabs(){
@@ -1035,7 +1554,7 @@ async function saveDiagramPDF(){
 window.addEventListener('load',()=>{
   renderFileTabs();loadActiveFile();buildSnippets();
   renderTabs();loadCls();updateRelSels();
-  ['sig1','sig2','sig3','sig4'].forEach(makeSig);
+  ['sig1','sig2','sig3','sig4','sig5','sig6'].forEach(makeSig);
   setTimeout(()=>{resizeCv();drawDiagram();},100);
 });
 window.addEventListener('resize',()=>{

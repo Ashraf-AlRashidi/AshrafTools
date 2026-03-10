@@ -9,7 +9,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getDatabase, ref, runTransaction, onValue, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-  import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAX1b0UGjPgbX503SVS1cxv_LN2GJmqPjU",
@@ -37,9 +37,9 @@
     if(el) el.textContent = (snap.val() || 0).toLocaleString('ar-EG');
   });
 
-  // ══ Google Login ══
-  window.loginWithGoogle = () => {
-    signInWithPopup(auth, provider).then(async (result) => {
+  // ══ معالجة الـ Redirect بعد الرجوع من Google ══
+  getRedirectResult(auth).then(async (result) => {
+    if (result && result.user) {
       const user = result.user;
       const userSnap = await get(child(ref(db), 'users/' + user.uid));
       if (!userSnap.exists()) {
@@ -52,10 +52,15 @@
           joinedAt: Date.now()
         });
       }
-    }).catch((err) => {
-      console.error("Login Error:", err);
-      showToast('❌ فشل تسجيل الدخول', 'error');
-    });
+      showToast('✅ أهلاً ' + user.displayName.split(' ')[0] + '!', 'success');
+    }
+  }).catch((err) => {
+    console.error("Redirect Error:", err);
+  });
+
+  // ══ Google Login بـ Redirect ══
+  window.loginWithGoogle = () => {
+    signInWithRedirect(auth, provider);
   };
 
   window.logoutUser = () => {

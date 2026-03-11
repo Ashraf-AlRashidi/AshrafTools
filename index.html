@@ -96,7 +96,15 @@
       } else {
         const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
         if (error) throw error;
-        showToast('✅ أهلاً بيك!', 'success');
+        // تأكد إن الـ profile موجود
+        const uid = data.user.id;
+        const { data: existing } = await sb.from('profiles').select('id').eq('id', uid).maybeSingle();
+        if (!existing) {
+          const uname = data.user.user_metadata?.name || email.split('@')[0];
+          await sb.from('profiles').insert({ id: uid, name: uname, email, points: 0, solved: 0 });
+        }
+        const uname2 = data.user.user_metadata?.name || email.split('@')[0];
+        showToast('✅ أهلاً ' + uname2 + '!', 'success');
         window.closeAuthModal();
       }
     } catch(e) {
@@ -1559,14 +1567,17 @@ async function submitProblem(){
   if(window._sb && window._currentUser){
     try {
       const uid = window._currentUser.id;
-      const {data} = await window._sb.from('profiles').select('points,solved').eq('id',uid).single();
-      const newPoints = (data?.points||0) + currentProblem.points;
-      const newSolved = (data?.solved||0) + 1;
-      await window._sb.from('profiles').update({
+      const {data: pData} = await window._sb.from('profiles').select('points,solved').eq('id',uid).maybeSingle();
+      const newPoints = (pData?.points||0) + currentProblem.points;
+      const newSolved = (pData?.solved||0) + 1;
+      await window._sb.from('profiles').upsert({
+        id: uid,
+        name: window._currentUser.user_metadata?.name || window._currentUser.email.split('@')[0],
+        email: window._currentUser.email,
         points: newPoints,
         solved: newSolved,
         last_solve: new Date().toISOString()
-      }).eq('id', uid);
+      });
     } catch(e){ console.error('points update error',e); }
   }
 
@@ -1662,7 +1673,7 @@ async function renderProfile(){
   const avatarUrl = localStorage.getItem('avatar_' + user.id);
   let dbData = {points:0, solved:0};
   if(window._sb){
-    const {data} = await window._sb.from('profiles').select('*').eq('id',user.id).single();
+    const {data} = await window._sb.from('profiles').select('*').eq('id',user.id).maybeSingle();
     if(data) dbData = data;
   }
   const totalPoints = PROBLEMS.reduce((s,p)=>s+p.points,0);

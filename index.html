@@ -6,11 +6,12 @@
 <title>AshrafTools — أدوات المهندس أشرف</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, runTransaction, onValue, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getDatabase, ref, runTransaction, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
+  // ══ Firebase — عداد الزيارات بس ══
   const firebaseConfig = {
     apiKey: "AIzaSyAX1b0UGjPgbX503SVS1cxv_LN2GJmqPjU",
     authDomain: "project-824f0.firebaseapp.com",
@@ -20,12 +21,8 @@
     messagingSenderId: "950408080300",
     appId: "1:950408080300:web:c901f7d885fb1c920fe809"
   };
-
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
-  const auth = getAuth(app);
-
-  // ══ عداد الزيارات ══
   const visitsRef = ref(db, 'visits');
   if(!sessionStorage.getItem('counted')){
     sessionStorage.setItem('counted','1');
@@ -35,6 +32,15 @@
     const el = document.getElementById('visitCount');
     if(el) el.textContent = (snap.val() || 0).toLocaleString('ar-EG');
   });
+</script>
+
+<script>
+  // ══ Supabase — Auth + Database ══
+  const { createClient } = supabase;
+  const sb = createClient(
+    'https://ciayroltxdoifrvomyju.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpYXlyb2x0eGRvaWZydm9teWp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxOTM3MjQsImV4cCI6MjA4ODc2OTcyNH0.QyFYCOT54qEK5t8IhcTKmt6yHHDIj6yZMF6VBzFtUV0'
+  );
 
   // ══ فتح/قفل المودال ══
   window.openAuthModal = (mode = 'login') => {
@@ -43,6 +49,10 @@
   };
   window.closeAuthModal = () => {
     document.getElementById('authModal').style.display = 'none';
+    document.getElementById('authEmail').value = '';
+    document.getElementById('authPass').value = '';
+    document.getElementById('authName').value = '';
+    document.getElementById('authError').textContent = '';
   };
   window.switchAuthMode = (mode) => {
     const isLogin = mode === 'login';
@@ -68,45 +78,54 @@
     if (!email || !pass) { errEl.textContent = '⚠️ ادخل الإيميل والباسورد'; return; }
     if (mode === 'register' && !name) { errEl.textContent = '⚠️ ادخل اسمك'; return; }
     btn.disabled = true; btn.textContent = '...جاري';
+
     try {
       if (mode === 'register') {
-        const cred = await createUserWithEmailAndPassword(auth, email, pass);
-        await updateProfile(cred.user, { displayName: name });
-        await set(ref(db, 'users/' + cred.user.uid), {
-          name, email, points: 0, solved: 0, joinedAt: Date.now()
+        const { data, error } = await sb.auth.signUp({
+          email, password: pass,
+          options: { data: { name } }
+        });
+        if (error) throw error;
+        // حفظ في profiles
+        await sb.from('profiles').insert({
+          id: data.user.id,
+          name, email, points: 0, solved: 0
         });
         showToast('🎉 أهلاً ' + name + '! تم إنشاء حسابك', 'success');
+        window.closeAuthModal();
       } else {
-        await signInWithEmailAndPassword(auth, email, pass);
+        const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+        if (error) throw error;
         showToast('✅ أهلاً بيك!', 'success');
+        window.closeAuthModal();
       }
-      window.closeAuthModal();
     } catch(e) {
       const msgs = {
-        'auth/email-already-in-use': '⚠️ الإيميل ده موجود بالفعل',
-        'auth/wrong-password': '⚠️ الباسورد غلط',
-        'auth/user-not-found': '⚠️ الإيميل ده مش موجود',
-        'auth/weak-password': '⚠️ الباسورد ضعيف (٦ حروف على الأقل)',
-        'auth/invalid-email': '⚠️ الإيميل مش صح',
-        'auth/invalid-credential': '⚠️ الإيميل أو الباسورد غلط',
+        'Invalid login credentials': '⚠️ الإيميل أو الباسورد غلط',
+        'User already registered': '⚠️ الإيميل ده موجود بالفعل',
+        'Password should be at least 6 characters': '⚠️ الباسورد ضعيف (٦ حروف على الأقل)',
+        'Unable to validate email address: invalid format': '⚠️ الإيميل مش صح',
       };
-      errEl.textContent = msgs[e.code] || '❌ حصل خطأ، حاول تاني';
+      errEl.textContent = msgs[e.message] || '❌ ' + e.message;
     }
     btn.disabled = false;
     btn.textContent = mode === 'login' ? 'دخول' : 'إنشاء حساب';
   };
 
   // ══ تسجيل الخروج ══
-  window.logoutUser = () => {
-    signOut(auth).then(() => showToast('👋 تم تسجيل الخروج', ''));
+  window.logoutUser = async () => {
+    await sb.auth.signOut();
+    showToast('👋 تم تسجيل الخروج', '');
+    updateLoginBtn(null);
   };
 
-  // ══ حالة الـ User ══
-  onAuthStateChanged(auth, (user) => {
+  // ══ تحديث الزرار ══
+  function updateLoginBtn(user) {
     const loginBtn = document.getElementById('loginBtn');
     if (!loginBtn) return;
     if (user) {
-      loginBtn.innerHTML = `<span style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">👋 ${user.displayName?.split(' ')[0] || 'مرحباً'}</span><span style="opacity:.5;font-size:.75rem;margin-right:4px;" onclick="event.stopPropagation();window.logoutUser()">✕</span>`;
+      const name = user.user_metadata?.name || user.email.split('@')[0];
+      loginBtn.innerHTML = `<span style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">👋 ${name}</span><span style="opacity:.5;font-size:.75rem;margin-right:6px;" onclick="event.stopPropagation();window.logoutUser()">✕</span>`;
       loginBtn.onclick = null;
       loginBtn.style.background = 'rgba(34,211,122,.12)';
       loginBtn.style.border = '1px solid rgba(34,211,122,.3)';
@@ -120,11 +139,19 @@
       loginBtn.style.color = '';
       window._currentUser = null;
     }
+  }
+
+  // ══ تحقق من الجلسة الحالية ══
+  sb.auth.getSession().then(({ data: { session } }) => {
+    updateLoginBtn(session?.user || null);
   });
 
-  window._db = db;
-  window._ref = ref;
-  window._firebaseReady = true;
+  sb.auth.onAuthStateChange((_event, session) => {
+    updateLoginBtn(session?.user || null);
+  });
+
+  window._sb = sb;
+  window._supabaseReady = true;
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>

@@ -119,15 +119,31 @@
     updateLoginBtn(null);
   };
 
-  // ══ تحديث الزرار ══
+  // ══ تحديث الزرار بالأفاتار ══
+  function getAvatar(user) {
+    const saved = localStorage.getItem('avatar_' + user.id);
+    return saved || null;
+  }
+
+  function makeAvatar(name, avatarUrl, size=28) {
+    if(avatarUrl) return `<img src="${avatarUrl}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;border:2px solid rgba(34,211,122,.4);flex-shrink:0;">`;
+    const colors = ['#4f8ef7','#22d37a','#a66cff','#f5a623','#f06292','#00e5d4'];
+    const color = colors[(name.charCodeAt(0)||0) % colors.length];
+    return `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};display:grid;place-items:center;font-size:${size*0.4}px;font-weight:900;color:white;flex-shrink:0;border:2px solid ${color}44;">${name.charAt(0).toUpperCase()}</div>`;
+  }
+
   function updateLoginBtn(user) {
     const loginBtn = document.getElementById('loginBtn');
     if (!loginBtn) return;
     if (user) {
       const name = user.user_metadata?.name || user.email.split('@')[0];
-      loginBtn.innerHTML = `<span style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">👋 ${name}</span><span style="opacity:.5;font-size:.75rem;margin-right:6px;" onclick="event.stopPropagation();window.logoutUser()">✕</span>`;
-      loginBtn.onclick = null;
-      loginBtn.style.background = 'rgba(34,211,122,.12)';
+      const avatar = getAvatar(user);
+      loginBtn.innerHTML = `
+        ${makeAvatar(name, avatar, 26)}
+        <span style="max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name.split(' ')[0]}</span>
+        <span style="opacity:.4;font-size:.7rem;" onclick="event.stopPropagation();window.logoutUser()">✕</span>`;
+      loginBtn.onclick = () => switchTab('profile', document.querySelector('[onclick*="profile"]'));
+      loginBtn.style.background = 'rgba(34,211,122,.1)';
       loginBtn.style.border = '1px solid rgba(34,211,122,.3)';
       loginBtn.style.color = 'var(--green)';
       window._currentUser = user;
@@ -437,9 +453,14 @@ label.flabel{display:block;font-size:.7rem;font-weight:700;color:var(--muted);te
   <button class="tab-btn" onclick="switchTab('project',this)">🚀 مشروع كامل → ZIP</button>
   <button class="tab-btn" onclick="switchTab('guide',this)" style="color:var(--orange);border-bottom-color:transparent;">📖 دليل الاستخدام</button>
   <button class="tab-btn" onclick="switchTab('keys',this)" style="color:var(--cyan);border-bottom-color:transparent;">⌨️ الاختصارات</button>
-  <button id="loginBtn" class="btn btn-primary" onclick="loginWithGoogle()"
+  <button class="tab-btn" onclick="switchTab('problems',this)">🧩 تحديات
+    <span class="tab-badge" style="background:var(--orange);">10</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab('leaderboard',this)">🏆 المتصدرون</button>
+  <button class="tab-btn" onclick="switchTab('profile',this)">👤 بروفايل</button>
+  <button id="loginBtn" class="btn btn-primary" onclick="openAuthModal('login')"
     style="margin-right:auto;margin-left:8px;flex-shrink:0;padding:7px 14px;font-size:.8rem;">
-    🚀 دخول بجوجل
+    🚀 دخول / تسجيل
   </button>
   <div style="display:flex;align-items:center;gap:6px;padding:0 16px;flex-shrink:0;border-right:1px solid var(--border);">
 
@@ -1041,7 +1062,7 @@ placeholder="// 👋 أهلاً يا بشمهندس!
     <div class="page-icon" style="background:rgba(0,229,212,.1);border:1px solid rgba(0,229,212,.3);width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font-size:1.5rem;flex-shrink:0;">⌨️</div>
     <div>
       <div class="page-title">اختصارات الكيبورد</div>
-      <div class="page-sub">كل الاختصارات اللي هتوفرلك وقت وتخليك شغال أسرع</div>
+      <div class="page-sub">كل اختصارات IntelliJ وWindows في مكان واحد</div>
     </div>
   </div>
 
@@ -1049,179 +1070,303 @@ placeholder="// 👋 أهلاً يا بشمهندس!
     .key{display:inline-flex;align-items:center;justify-content:center;
       background:var(--surface3);border:1px solid var(--border2);
       border-bottom:3px solid var(--border2);border-radius:7px;
-      font-family:var(--font-mono);font-size:.78rem;font-weight:700;
-      color:var(--text);padding:4px 10px;white-space:nowrap;line-height:1;}
-    .key.blue{border-color:rgba(79,142,247,.5);border-bottom-color:var(--blue);color:var(--blue);background:rgba(79,142,247,.08);}
-    .key.green{border-color:rgba(34,211,122,.5);border-bottom-color:var(--green);color:var(--green);background:rgba(34,211,122,.08);}
-    .key.orange{border-color:rgba(245,166,35,.5);border-bottom-color:var(--orange);color:var(--orange);background:rgba(245,166,35,.08);}
-    .key.purple{border-color:rgba(166,108,255,.5);border-bottom-color:var(--purple);color:var(--purple);background:rgba(166,108,255,.08);}
-    .key.cyan{border-color:rgba(0,229,212,.5);border-bottom-color:var(--cyan);color:var(--cyan);background:rgba(0,229,212,.08);}
-    .key-plus{color:var(--muted);font-size:.8rem;margin:0 4px;}
-    .shortcut-row{display:flex;align-items:center;gap:14px;padding:13px 16px;
-      border-radius:10px;transition:background .15s;}
-    .shortcut-row:hover{background:var(--surface2);}
-    .shortcut-keys{display:flex;align-items:center;flex-shrink:0;min-width:160px;flex-wrap:wrap;gap:4px;}
-    .shortcut-desc{font-size:.88rem;color:var(--text);line-height:1.5;}
-    .shortcut-desc small{display:block;color:var(--muted);font-size:.76rem;margin-top:2px;}
-    .section-title{font-size:.7rem;font-weight:900;text-transform:uppercase;letter-spacing:2px;
-      color:var(--muted);padding:8px 16px 6px;margin-top:8px;}
+      font-family:var(--font-mono);font-size:.75rem;font-weight:700;
+      color:var(--text);padding:3px 9px;white-space:nowrap;line-height:1.4;}
+    .key.b{border-color:rgba(79,142,247,.5);border-bottom-color:var(--blue);color:var(--blue);background:rgba(79,142,247,.08);}
+    .key.g{border-color:rgba(34,211,122,.5);border-bottom-color:var(--green);color:var(--green);background:rgba(34,211,122,.08);}
+    .key.o{border-color:rgba(245,166,35,.5);border-bottom-color:var(--orange);color:var(--orange);background:rgba(245,166,35,.08);}
+    .key.p{border-color:rgba(166,108,255,.5);border-bottom-color:var(--purple);color:var(--purple);background:rgba(166,108,255,.08);}
+    .key.c{border-color:rgba(0,229,212,.5);border-bottom-color:var(--cyan);color:var(--cyan);background:rgba(0,229,212,.08);}
+    .key.r{border-color:rgba(240,90,90,.5);border-bottom-color:var(--red);color:var(--red);background:rgba(240,90,90,.08);}
+    .kp{color:var(--muted);font-size:.75rem;margin:0 3px;}
+    .sk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:4px;}
+    .sk{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;transition:background .12s;}
+    .sk:hover{background:var(--surface2);}
+    .sk-keys{display:flex;align-items:center;flex-wrap:wrap;gap:3px;min-width:145px;flex-shrink:0;}
+    .sk-desc{font-size:.84rem;color:var(--text);}
+    .sk-desc small{display:block;color:var(--muted);font-size:.73rem;margin-top:1px;}
+    .ks-head{font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:2px;color:var(--muted);padding:12px 12px 6px;display:flex;align-items:center;gap:7px;}
+    .ks-head::after{content:'';flex:1;height:1px;background:var(--border);}
   </style>
 
-  <!-- ═══ GENERAL ═══ -->
-  <div class="card" style="padding:8px;margin-bottom:20px;">
-    <div class="section-title">🌐 عام — بيشتغل في أي مكان</div>
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key cyan">Ctrl</span><span class="key-plus">+</span><span class="key cyan">1</span></div>
-      <div class="shortcut-desc">فتح صفحة صور → PDF<small>روح على الأداة الأولى مباشرة</small></div>
-    </div>
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key cyan">Ctrl</span><span class="key-plus">+</span><span class="key cyan">2</span></div>
-      <div class="shortcut-desc">فتح Java Editor<small>روح على محرر الكود مباشرة</small></div>
-    </div>
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key cyan">Ctrl</span><span class="key-plus">+</span><span class="key cyan">3</span></div>
-      <div class="shortcut-desc">فتح Class Diagram<small>روح على رسام الـ Diagram مباشرة</small></div>
-    </div>
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key cyan">Ctrl</span><span class="key-plus">+</span><span class="key cyan">4</span></div>
-      <div class="shortcut-desc">فتح مشروع كامل ZIP<small>روح على صفحة التصدير مباشرة</small></div>
+  <!-- Quick Nav -->
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;">
+    <a href="#ks-win" style="text-decoration:none"><span class="btn btn-ghost btn-sm">🪟 Windows</span></a>
+    <a href="#ks-ij-nav" style="text-decoration:none"><span class="btn btn-ghost btn-sm" style="color:var(--purple);">🔍 IntelliJ تنقل</span></a>
+    <a href="#ks-ij-edit" style="text-decoration:none"><span class="btn btn-ghost btn-sm" style="color:var(--purple);">✏️ IntelliJ تعديل</span></a>
+    <a href="#ks-ij-run" style="text-decoration:none"><span class="btn btn-ghost btn-sm" style="color:var(--green);">▶️ IntelliJ تشغيل</span></a>
+    <a href="#ks-live" style="text-decoration:none"><span class="btn btn-ghost btn-sm" style="color:var(--orange);">⚡ Live Templates</span></a>
+  </div>
+
+  <!-- ══ WINDOWS ══ -->
+  <div id="ks-win" class="card" style="padding:12px;margin-bottom:16px;border-right:3px solid var(--cyan);">
+    <div class="ks-head">🪟 Windows — اختصارات عامة</div>
+    <div class="sk-grid">
+      ${[
+        ['Ctrl','C','نسخ','Copy المحدد'],
+        ['Ctrl','V','لصق','Paste من الـ Clipboard'],
+        ['Ctrl','X','قص','Cut المحدد'],
+        ['Ctrl','Z','تراجع','Undo آخر عملية'],
+        ['Ctrl','Y','إعادة','Redo'],
+        ['Ctrl','A','تحديد الكل','Select All'],
+        ['Ctrl','S','حفظ','Save الملف'],
+        ['Ctrl','P','طباعة','Print'],
+        ['Ctrl','F','بحث','Find في الملف'],
+        ['Ctrl','H','استبدال','Find & Replace'],
+        ['Ctrl','N','ملف جديد','New file/window'],
+        ['Ctrl','O','فتح ملف','Open file'],
+        ['Ctrl','W','إغلاق تاب','Close current tab'],
+        ['Ctrl','T','تاب جديد','New browser tab'],
+        ['Ctrl','Tab','التنقل بين التابات','Switch tabs'],
+        ['Ctrl','Shift','T','فتح تاب مغلق','Reopen closed tab'],
+        ['Ctrl','+','تكبير','Zoom in'],
+        ['Ctrl','-','تصغير','Zoom out'],
+        ['Ctrl','0','حجم طبيعي','Reset zoom'],
+        ['Alt','Tab','التنقل بين البرامج','Switch windows'],
+        ['Alt','F4','إغلاق البرنامج','Close program'],
+        ['Win','D','سطح المكتب','Show desktop'],
+        ['Win','L','قفل الجهاز','Lock screen'],
+        ['Win','E','المستكشف','File explorer'],
+        ['Win','R','Run','Open run dialog'],
+        ['Win','I','الإعدادات','Open settings'],
+        ['Win','Tab','عرض النوافذ','Task view'],
+        ['Win','V','Clipboard','Clipboard history'],
+        ['Win','Shift','S','لقطة شاشة','Screenshot snip'],
+        ['PrtSc','','لقطة الشاشة كلها','Full screenshot'],
+        ['Shift','Delete','حذف نهائي','Delete permanently'],
+        ['F2','','إعادة تسمية','Rename file'],
+        ['F5','','تحديث','Refresh'],
+        ['Ctrl','Shift','Esc','مدير المهام','Task Manager'],
+      ].map(([k1,k2,desc,sub])=>{
+        const keys = k2 ? `<span class="key c">${k1}</span><span class="kp">+</span><span class="key c">${k2}</span>` : `<span class="key c">${k1}</span>`;
+        return `<div class="sk"><div class="sk-keys">${keys}</div><div class="sk-desc">${desc}<small>${sub}</small></div></div>`;
+      }).join('')}
     </div>
   </div>
 
-  <!-- ═══ JAVA EDITOR ═══ -->
-  <div class="card" style="padding:8px;margin-bottom:20px;">
-    <div class="section-title">☕ Java Editor — اختصارات الكتابة</div>
-
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key blue">Tab</span></div>
-      <div class="shortcut-desc">إضافة 4 مسافات (Indent)<small>بدل ما تضغط Space 4 مرات</small></div>
-    </div>
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key blue">Ctrl</span><span class="key-plus">+</span><span class="key blue">A</span></div>
-      <div class="shortcut-desc">تحديد كل الكود<small>تحديد كل محتوى الـ editor دفعة واحدة</small></div>
-    </div>
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key blue">Ctrl</span><span class="key-plus">+</span><span class="key blue">C</span></div>
-      <div class="shortcut-desc">نسخ الكود المحدد<small>انسخ الكود بعد ما تعمل Ctrl+A</small></div>
-    </div>
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key blue">Ctrl</span><span class="key-plus">+</span><span class="key blue">V</span></div>
-      <div class="shortcut-desc">لصق الكود<small>ألصق الكود اللي نسخته من IDE أو من أي مكان</small></div>
-    </div>
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key blue">Ctrl</span><span class="key-plus">+</span><span class="key blue">X</span></div>
-      <div class="shortcut-desc">قص الكود المحدد<small>بيشيل الكود ويحطه في الـ Clipboard</small></div>
-    </div>
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key blue">Ctrl</span><span class="key-plus">+</span><span class="key blue">Z</span></div>
-      <div class="shortcut-desc">تراجع عن آخر تعديل (Undo)<small>لو غلطت في حاجة ارجع للخطوة اللي فاتت</small></div>
-    </div>
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key blue">Ctrl</span><span class="key-plus">+</span><span class="key blue">Y</span></div>
-      <div class="shortcut-desc">إعادة آخر تعديل (Redo)<small>إعادة الحاجة اللي عملت Undo عليها</small></div>
-    </div>
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key blue">Ctrl</span><span class="key-plus">+</span><span class="key blue">F</span></div>
-      <div class="shortcut-desc">بحث في الصفحة<small>دور على كلمة أو كود معين جوا الـ editor</small></div>
-    </div>
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key green">Enter</span></div>
-      <div class="shortcut-desc">إضافة Attribute أو Method<small>في خانات الإضافة بيحفظ ويضيف تلقائي من غير ما تضغط الزرار</small></div>
-    </div>
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key orange">Ctrl</span><span class="key-plus">+</span><span class="key orange">S</span></div>
-      <div class="shortcut-desc">حفظ الصفحة (المتصفح)<small>ممكن تستخدمه لحفظ الـ HTML لو على جهازك</small></div>
+  <!-- ══ INTELLIJ NAVIGATE ══ -->
+  <div id="ks-ij-nav" class="card" style="padding:12px;margin-bottom:16px;border-right:3px solid var(--purple);">
+    <div class="ks-head">🔍 IntelliJ IDEA — البحث والتنقل</div>
+    <div class="sk-grid">
+      ${[
+        ['Shift','Shift','Search Everywhere','ابحث في كل حاجة دفعة واحدة'],
+        ['Ctrl','N','Find Class','ابحث عن كلاس باسمه'],
+        ['Ctrl','Shift','N','Find File','ابحث عن ملف'],
+        ['Ctrl','Alt','Shift','N','Find Symbol','ابحث عن method أو variable'],
+        ['Ctrl','B','Go to Declaration','روح لتعريف المتغير أو الدالة'],
+        ['Ctrl','Alt','B','Go to Implementation','روح للتنفيذ'],
+        ['Ctrl','U','Go to Super','روح للكلاس الأب'],
+        ['Alt','F7','Find Usages','فين بيتستخدم ده؟'],
+        ['Ctrl','F12','File Structure','هيكل الملف (methods & fields)'],
+        ['Ctrl','E','Recent Files','آخر الملفات اللي فتحتها'],
+        ['Ctrl','Shift','E','Recent Locations','آخر الأماكن في الكود'],
+        ['Alt','←','Back','ارجع للمكان السابق'],
+        ['Alt','→','Forward','روح للأمام'],
+        ['Ctrl','G','Go to Line','روح لسطر معين بالرقم'],
+        ['Ctrl','F','Find in File','بحث في الملف'],
+        ['Ctrl','R','Replace in File','استبدال في الملف'],
+        ['Ctrl','Shift','F','Find in Path','بحث في كل المشروع'],
+        ['Ctrl','Shift','R','Replace in Path','استبدال في كل المشروع'],
+        ['Ctrl','Tab','Switcher','التنقل بين الملفات المفتوحة'],
+        ['Esc','','Close Panel','إغلاق أي panel مفتوح'],
+      ].map(([k1,k2,k3,desc,sub])=>{
+        let keys='';
+        if(sub===undefined){sub=desc;desc=k3;k3='';}
+        if(k3) keys=`<span class="key p">${k1}</span><span class="kp">+</span><span class="key p">${k2}</span><span class="kp">+</span><span class="key p">${k3}</span>`;
+        else if(k2) keys=`<span class="key p">${k1}</span><span class="kp">+</span><span class="key p">${k2}</span>`;
+        else keys=`<span class="key p">${k1}</span>`;
+        return `<div class="sk"><div class="sk-keys">${keys}</div><div class="sk-desc">${desc}<small>${sub}</small></div></div>`;
+      }).join('')}
     </div>
   </div>
 
-  <!-- ═══ BROWSER ═══ -->
-  <div class="card" style="padding:8px;margin-bottom:20px;">
-    <div class="section-title">🌍 المتصفح — اختصارات مفيدة</div>
-
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key purple">F5</span></div>
-      <div class="shortcut-desc">تحديث الصفحة<small>ملحوظة: الكود هيتمسح — احفظه الأول!</small></div>
-    </div>
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key purple">Ctrl</span><span class="key-plus">+</span><span class="key purple">R</span></div>
-      <div class="shortcut-desc">تحديث الصفحة (بديل F5)<small>نفس تأثير F5</small></div>
-    </div>
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key purple">Ctrl</span><span class="key-plus">+</span><span class="key purple">+</span></div>
-      <div class="shortcut-desc">تكبير عرض الصفحة<small>لو الكتابة صغيرة كبّرها</small></div>
-    </div>
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key purple">Ctrl</span><span class="key-plus">+</span><span class="key purple">-</span></div>
-      <div class="shortcut-desc">تصغير عرض الصفحة<small>لو عايز تشوف أكتر على الشاشة</small></div>
-    </div>
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key purple">Ctrl</span><span class="key-plus">+</span><span class="key purple">0</span></div>
-      <div class="shortcut-desc">إعادة الحجم الطبيعي<small>ارجع للحجم الافتراضي 100%</small></div>
-    </div>
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key purple">F11</span></div>
-      <div class="shortcut-desc">ملء الشاشة (Fullscreen)<small>تخفي الـ toolbar وتشتغل على شاشة كاملة</small></div>
-    </div>
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key purple">Ctrl</span><span class="key-plus">+</span><span class="key purple">P</span></div>
-      <div class="shortcut-desc">طباعة أو حفظ كـ PDF<small>تقدر تحفظ الصفحة كـ PDF من المتصفح</small></div>
-    </div>
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key purple">Ctrl</span><span class="key-plus">+</span><span class="key purple">D</span></div>
-      <div class="shortcut-desc">إضافة الموقع للمفضلة<small>احفظ الموقع عندك عشان ترجعله بسرعة</small></div>
-    </div>
-  </div>
-
-  <!-- ═══ TEXT EDITING ═══ -->
-  <div class="card" style="padding:8px;margin-bottom:20px;">
-    <div class="section-title">✍️ تحرير النصوص — اختصارات متقدمة</div>
-
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key">Home</span></div>
-      <div class="shortcut-desc">الذهاب لأول السطر<small>المؤشر يروح لأول الـ line اللي انت فيها</small></div>
-    </div>
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key">End</span></div>
-      <div class="shortcut-desc">الذهاب لآخر السطر<small>المؤشر يروح لآخر الـ line اللي انت فيها</small></div>
-    </div>
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key">Ctrl</span><span class="key-plus">+</span><span class="key">Home</span></div>
-      <div class="shortcut-desc">الذهاب لأول الكود كله<small>روح لأول سطر في الـ editor</small></div>
-    </div>
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key">Ctrl</span><span class="key-plus">+</span><span class="key">End</span></div>
-      <div class="shortcut-desc">الذهاب لآخر الكود كله<small>روح لآخر سطر في الـ editor</small></div>
-    </div>
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key">Shift</span><span class="key-plus">+</span><span class="key">↑↓</span></div>
-      <div class="shortcut-desc">تحديد أسطر بالأسهم<small>اضغط Shift واستخدم الأسهم لتحديد سطر سطر</small></div>
-    </div>
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key">Ctrl</span><span class="key-plus">+</span><span class="key">Shift</span><span class="key-plus">+</span><span class="key">K</span></div>
-      <div class="shortcut-desc">حذف سطر كامل<small>يشيل السطر اللي المؤشر عليه بدون ما تحدده</small></div>
-    </div>
-    <div class="shortcut-row">
-      <div class="shortcut-keys"><span class="key">Ctrl</span><span class="key-plus">+</span><span class="key">← →</span></div>
-      <div class="shortcut-desc">التنقل كلمة كلمة<small>المؤشر يتحرك كلمة كاملة مش حرف حرف</small></div>
+  <!-- ══ INTELLIJ EDIT ══ -->
+  <div id="ks-ij-edit" class="card" style="padding:12px;margin-bottom:16px;border-right:3px solid var(--blue);">
+    <div class="ks-head">✏️ IntelliJ IDEA — تعديل الكود</div>
+    <div class="sk-grid">
+      ${[
+        ['Ctrl','Space','Basic Completion','اقتراحات الكود الأساسية'],
+        ['Ctrl','Shift','Space','Smart Completion','اقتراحات ذكية حسب النوع'],
+        ['Alt','Enter','Show Intentions','إصلاح الكود والاقتراحات'],
+        ['Ctrl','Alt','L','Reformat Code','ترتيب وتنسيق الكود تلقائي'],
+        ['Ctrl','Alt','O','Optimize Imports','حذف الـ imports الزيادة'],
+        ['Ctrl','/','Comment Line','تعليق سطر // '],
+        ['Ctrl','Shift','/','Comment Block','تعليق بلوك /* */'],
+        ['Ctrl','D','Duplicate Line','نسخ السطر الحالي تحته'],
+        ['Ctrl','Y','Delete Line','حذف السطر كامل'],
+        ['Alt','Shift','↑','Move Line Up','نقل السطر لأعلى'],
+        ['Alt','Shift','↓','Move Line Down','نقل السطر لأسفل'],
+        ['Ctrl','Shift','↑','Move Statement Up','نقل الـ method لأعلى'],
+        ['Ctrl','Shift','↓','Move Statement Down','نقل الـ method لأسفل'],
+        ['Ctrl','W','Extend Selection','توسيع التحديد تدريجياً'],
+        ['Ctrl','Shift','W','Shrink Selection','تضييق التحديد'],
+        ['Shift','F6','Rename','إعادة تسمية variable/method في كل الكود'],
+        ['Ctrl','F6','Change Signature','تغيير signature الدالة'],
+        ['Ctrl','Alt','M','Extract Method','استخراج كود في method جديدة'],
+        ['Ctrl','Alt','V','Extract Variable','استخراج قيمة في variable'],
+        ['Ctrl','Alt','F','Extract Field','استخراج في field'],
+        ['Ctrl','Alt','P','Extract Parameter','استخراج في parameter'],
+        ['Ctrl','Alt','T','Surround With','لف الكود في try/if/for...'],
+        ['Ctrl','Shift','U','Toggle Case','تحويل UPPER/lower case'],
+        ['Alt','Insert','Generate','توليد Constructor/Getter/Setter'],
+        ['Ctrl','O','Override Methods','Override من الأب'],
+        ['Ctrl','I','Implement Methods','تنفيذ methods من Interface'],
+      ].map(([k1,k2,k3,desc,sub])=>{
+        let keys='';
+        if(sub===undefined){sub=desc;desc=k3;k3='';}
+        if(k3) keys=`<span class="key b">${k1}</span><span class="kp">+</span><span class="key b">${k2}</span><span class="kp">+</span><span class="key b">${k3}</span>`;
+        else if(k2) keys=`<span class="key b">${k1}</span><span class="kp">+</span><span class="key b">${k2}</span>`;
+        else keys=`<span class="key b">${k1}</span>`;
+        return `<div class="sk"><div class="sk-keys">${keys}</div><div class="sk-desc">${desc}<small>${sub}</small></div></div>`;
+      }).join('')}
     </div>
   </div>
 
-  <!-- tip -->
-  <div class="card" style="background:rgba(0,229,212,.04);border-color:rgba(0,229,212,.2);margin-bottom:24px;">
-    <div style="font-size:.88rem;line-height:2;color:var(--muted);">
-      <strong style="color:var(--cyan);display:block;margin-bottom:6px;">💡 نصيحة ذهبية</strong>
-      الاختصار الأهم لطالب هندسة هو:<br>
-      <span class="key blue">Ctrl</span><span class="key-plus" style="margin:0 6px">+</span><span class="key blue">A</span>
-      <span class="key-plus" style="margin:0 6px">ثم</span>
-      <span class="key blue">Ctrl</span><span class="key-plus" style="margin:0 6px">+</span><span class="key blue">C</span>
-      <span class="key-plus" style="margin:0 6px">ثم</span>
-      <span class="key blue">Ctrl</span><span class="key-plus" style="margin:0 6px">+</span><span class="key blue">V</span>
-      <br><br>
-      خد الكود بتاعك من الـ IDE → الصقه هنا → نزّل ZIP ✅
+  <!-- ══ INTELLIJ RUN/DEBUG ══ -->
+  <div id="ks-ij-run" class="card" style="padding:12px;margin-bottom:16px;border-right:3px solid var(--green);">
+    <div class="ks-head">▶️ IntelliJ IDEA — تشغيل وDebug</div>
+    <div class="sk-grid">
+      ${[
+        ['Shift','F10','Run','تشغيل البرنامج'],
+        ['Shift','F9','Debug','تشغيل في Debug mode'],
+        ['Ctrl','F2','Stop','إيقاف البرنامج'],
+        ['Ctrl','F5','Rerun','إعادة التشغيل'],
+        ['F8','Step Over','خطوة خطوة (تجاوز الدالة)'],
+        ['F7','Step Into','الدخول داخل الدالة'],
+        ['Shift','F8','Step Out','الخروج من الدالة'],
+        ['Alt','F9','Run to Cursor','شغّل لحد مكان الـ cursor'],
+        ['Alt','F8','Evaluate Expression','تقييم expression وانت في Debug'],
+        ['Ctrl','F8','Toggle Breakpoint','إضافة/حذف Breakpoint'],
+        ['Ctrl','Shift','F8','View Breakpoints','شوف كل الـ Breakpoints'],
+        ['F9','Resume','استكمال التشغيل'],
+      ].map(([k1,k2,k3,desc,sub])=>{
+        let keys='',label='',tip='';
+        if(sub===undefined){tip=desc;label=k3;keys=k2?`<span class="key g">${k1}</span><span class="kp">+</span><span class="key g">${k2}</span>`:`<span class="key g">${k1}</span>`;}
+        else{tip=sub;label=desc;keys=`<span class="key g">${k1}</span><span class="kp">+</span><span class="key g">${k2}</span><span class="kp">+</span><span class="key g">${k3}</span>`;}
+        return `<div class="sk"><div class="sk-keys">${keys}</div><div class="sk-desc">${label}<small>${tip}</small></div></div>`;
+      }).join('')}
+    </div>
+  </div>
+
+  <!-- ══ LIVE TEMPLATES ══ -->
+  <div id="ks-live" class="card" style="padding:12px;margin-bottom:16px;border-right:3px solid var(--orange);">
+    <div class="ks-head">⚡ Live Templates — اكتبها وضغط Tab</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;padding:4px;">
+      ${[
+        ['sout','System.out.println()','أشهر سطر في Java'],
+        ['souf','System.out.printf()','طباعة منسقة'],
+        ['serr','System.err.println()','طباعة error'],
+        ['psvm','public static void main','نقطة البداية'],
+        ['fori','for (int i=0; i<n; i++)','for loop بـ index'],
+        ['iter','for (Type x : collection)','for-each loop'],
+        ['itco','Iterator pattern','التنقل بـ Iterator'],
+        ['ifn','if (x == null)','شرط null check'],
+        ['inn','if (x != null)','شرط not null'],
+        ['inst','instanceof check','التحقق من النوع'],
+        ['while','while loop','حلقة while'],
+        ['do','do-while loop','حلقة do-while'],
+        ['thr','throw new ...','رمي exception'],
+        ['try','try-catch block','معالجة الاستثناءات'],
+        ['St','String','نوع النص'],
+        ['toar','collection.toArray()','تحويل لـ array'],
+        ['prsf','private static final','ثابت خاص'],
+        ['geti','getInstance()','Singleton pattern'],
+        ['lazy','Lazy initialization','تهيئة كسولة'],
+        ['new','new Object()','إنشاء كائن'],
+      ].map(([k,title,desc])=>`
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:11px 14px;display:flex;align-items:center;gap:10px;transition:border-color .15s;"
+          onmouseenter="this.style.borderColor='rgba(245,166,35,.4)'" onmouseleave="this.style.borderColor=''">
+          <span class="key o" style="font-size:.8rem;padding:4px 10px;">${k}</span>
+          <div style="flex:1;">
+            <div style="font-size:.82rem;font-weight:700;">${title}</div>
+            <div style="font-size:.72rem;color:var(--muted);margin-top:1px;">${desc}</div>
+          </div>
+        </div>`).join('')}
     </div>
   </div>
 
   <div class="signature"><div class="sig-line1">✦ AshrafTools ✦ بواسطة البشمهندس</div><div class="sig-line2"><span id="sig6"></span></div></div>
+</div>
+
+
+<!-- ══ PAGE 7: PROBLEMS ══ -->
+<div id="page-problems" class="page">
+  <div class="page-header">
+    <div class="page-icon" style="background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3);">🧩</div>
+    <div>
+      <div class="page-title">تحديات البرمجة</div>
+      <div class="page-sub">حل المسائل، اجمع نقاط، وتصدر الليدربورد 🏆</div>
+    </div>
+  </div>
+
+  <!-- مستوى الصعوبة filter -->
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;">
+    <button class="btn btn-ghost btn-sm prob-filter active" onclick="filterProblems('all',this)">🌐 الكل</button>
+    <button class="btn btn-sm prob-filter" onclick="filterProblems('easy',this)" style="background:rgba(34,211,122,.12);color:var(--green);border:1px solid rgba(34,211,122,.3);">🟢 سهل</button>
+    <button class="btn btn-sm prob-filter" onclick="filterProblems('medium',this)" style="background:rgba(245,166,35,.12);color:var(--orange);border:1px solid rgba(245,166,35,.3);">🟡 متوسط</button>
+    <button class="btn btn-sm prob-filter" onclick="filterProblems('hard',this)" style="background:rgba(240,90,90,.12);color:var(--red);border:1px solid rgba(240,90,90,.3);">🔴 صعب</button>
+    <button class="btn btn-sm prob-filter" onclick="filterProblems('impossible',this)" style="background:rgba(166,108,255,.12);color:var(--purple);border:1px solid rgba(166,108,255,.3);">💀 مستحيل</button>
+  </div>
+
+  <div id="problemsList" style="display:flex;flex-direction:column;gap:16px;"></div>
+
+  <!-- Problem Solver Modal -->
+  <div id="problemModal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.85);backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:16px;">
+    <div style="background:var(--surface);border:1px solid var(--border2);border-radius:20px;width:100%;max-width:700px;max-height:90vh;overflow-y:auto;">
+      <div style="padding:24px 28px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+        <div>
+          <div id="pmDiff" style="font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;"></div>
+          <div id="pmTitle" style="font-size:1.2rem;font-weight:900;"></div>
+          <div id="pmPoints" style="font-size:.82rem;color:var(--muted);margin-top:4px;"></div>
+        </div>
+        <button onclick="closeProblemModal()" style="background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;flex-shrink:0;">✕</button>
+      </div>
+      <div style="padding:24px 28px;">
+        <div id="pmDesc" style="background:var(--surface2);border-radius:10px;padding:16px;font-size:.9rem;line-height:1.9;color:var(--text);margin-bottom:20px;border:1px solid var(--border);"></div>
+        <div id="pmExamples" style="margin-bottom:20px;"></div>
+        <label class="flabel">إجابتك</label>
+        <textarea id="pmAnswer" class="finput code-editor" style="min-height:180px;margin-top:6px;font-family:var(--font-mono);" placeholder="// اكتب الكود هنا..."></textarea>
+        <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="submitProblem()" id="pmSubmitBtn" style="flex:1;justify-content:center;">✅ سلّم الإجابة</button>
+          <button class="btn btn-ghost" onclick="closeProblemModal()">إلغاء</button>
+        </div>
+        <div id="pmResult" style="margin-top:16px;display:none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="signature"><div class="sig-line1">✦ AshrafTools ✦ بواسطة البشمهندس</div><div class="sig-line2"><span id="sig7"></span></div></div>
+</div>
+
+<!-- ══ PAGE 8: LEADERBOARD ══ -->
+<div id="page-leaderboard" class="page">
+  <div class="page-header">
+    <div class="page-icon" style="background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3);">🏆</div>
+    <div>
+      <div class="page-title">لوحة المتصدرين</div>
+      <div class="page-sub">أكتر ناس حلت مسائل — منافسة يومية وأسبوعية 🔥</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div style="display:flex;gap:8px;margin-bottom:24px;">
+    <button class="btn btn-primary lb-tab" id="lbTabAll" onclick="loadLeaderboard('all')">👑 الكل</button>
+    <button class="btn btn-ghost lb-tab" id="lbTabDaily" onclick="loadLeaderboard('daily')">📅 اليومي</button>
+    <button class="btn btn-ghost lb-tab" id="lbTabWeekly" onclick="loadLeaderboard('weekly')">📆 الأسبوعي</button>
+  </div>
+
+  <div id="leaderboardList" style="display:flex;flex-direction:column;gap:10px;">
+    <div style="text-align:center;color:var(--muted);padding:40px;">جاري التحميل...</div>
+  </div>
+
+  <div class="signature"><div class="sig-line1">✦ AshrafTools ✦ بواسطة البشمهندس</div><div class="sig-line2"><span id="sig8"></span></div></div>
+</div>
+
+<!-- ══ PAGE 9: PROFILE ══ -->
+<div id="page-profile" class="page">
+  <div id="profileContent">
+    <!-- يتحمل ديناميكي -->
+  </div>
 </div>
 
 <div id="newFileModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);
@@ -1268,7 +1413,7 @@ function makeSig(id){
   const el=document.getElementById(id);if(!el)return;
   el.innerHTML=[...NAME].map((c,i)=>`<span class="sig-letter" style="animation-delay:${i*.18}s">${c}</span>`).join('');
 }
-['sig1','sig2','sig3','sig4','sig5','sig6'].forEach(makeSig);
+['sig1','sig2','sig3','sig4','sig5','sig6','sig7','sig8'].forEach(makeSig);
 
 /* ══ TAB SWITCH ══ */
 function switchTab(id,btn){
@@ -1278,6 +1423,9 @@ function switchTab(id,btn){
   if(btn)btn.classList.add('active');
   if(id==='diagram')setTimeout(()=>{resizeCv();drawDiagram();},60);
   if(id==='project')setTimeout(refreshProjectPage,80);
+  if(id==='problems')renderProblems();
+  if(id==='leaderboard')loadLeaderboard('all');
+  if(id==='profile')renderProfile();
 }
 
 // اختصارات Ctrl+1..4 للتنقل بين الصفحات
@@ -1289,6 +1437,320 @@ document.addEventListener('keydown',e=>{
   else if(e.key==='3'){e.preventDefault();switchTab('diagram',tabs[2]);}
   else if(e.key==='4'){e.preventDefault();switchTab('project',tabs[3]);}
 });
+
+/* ══════════════════════════════════
+   PROBLEMS DATA
+══════════════════════════════════ */
+const PROBLEMS = [
+  {id:'p1', title:'مجموع الأرقام', difficulty:'easy', points:10,
+   desc:'اكتب دالة تستقبل رقمين وترجع مجموعهم.',
+   examples:[{in:'add(3, 5)', out:'8'},{in:'add(-1, 4)', out:'3'}]},
+  {id:'p2', title:'الرقم الزوجي أو الفردي', difficulty:'easy', points:10,
+   desc:'اكتب دالة تستقبل رقم وتطبع "زوجي" لو كان زوجي و"فردي" لو كان فردي.',
+   examples:[{in:'check(4)', out:'زوجي'},{in:'check(7)', out:'فردي'}]},
+  {id:'p3', title:'عكس النص', difficulty:'easy', points:15,
+   desc:'اكتب دالة تستقبل String وترجعه معكوس.',
+   examples:[{in:'reverse("hello")', out:'"olleh"'},{in:'reverse("java")', out:'"avaj"'}]},
+  {id:'p4', title:'الفيبوناتشي', difficulty:'medium', points:30,
+   desc:'اكتب دالة تطبع أول N رقم في سلسلة فيبوناتشي. السلسلة: 0, 1, 1, 2, 3, 5, 8, ...',
+   examples:[{in:'fib(5)', out:'0 1 1 2 3'},{in:'fib(7)', out:'0 1 1 2 3 5 8'}]},
+  {id:'p5', title:'الباليندروم', difficulty:'medium', points:30,
+   desc:'اكتب دالة تتحقق لو الكلمة palindrome (تُقرأ بنفس الطريقة من الاتجاهين). ارجع true أو false.',
+   examples:[{in:'isPalindrome("racecar")', out:'true'},{in:'isPalindrome("hello")', out:'false'}]},
+  {id:'p6', title:'الفاكتوريال', difficulty:'medium', points:35,
+   desc:'اكتب دالة recursive تحسب factorial لرقم N. تذكر: factorial(0) = 1',
+   examples:[{in:'factorial(5)', out:'120'},{in:'factorial(0)', out:'1'}]},
+  {id:'p7', title:'Binary Search', difficulty:'hard', points:60,
+   desc:'نفّذ خوارزمية Binary Search على array مرتب. ارجع index العنصر أو -1 لو مش موجود.',
+   examples:[{in:'search([1,3,5,7,9], 5)', out:'2'},{in:'search([1,3,5], 4)', out:'-1'}]},
+  {id:'p8', title:'Linked List — إضافة وطباعة', difficulty:'hard', points:70,
+   desc:'اعمل Linked List في Java فيها: addFirst(), addLast(), printList(). اكتب الكلاسين Node و LinkedList.',
+   examples:[{in:'addFirst(1), addLast(2), addLast(3), printList()', out:'1 -> 2 -> 3'}]},
+  {id:'p9', title:'Stack بـ Array', difficulty:'hard', points:75,
+   desc:'نفّذ Stack باستخدام Array فيها: push(), pop(), peek(), isEmpty(). تعامل مع حالة الـ overflow و underflow.',
+   examples:[{in:'push(1),push(2),pop()', out:'2'},{in:'peek()', out:'1'}]},
+  {id:'p10', title:'Merge Sort', difficulty:'impossible', points:150,
+   desc:'نفّذ خوارزمية Merge Sort كاملة. اكتب الدالتين: mergeSort() و merge(). الخوارزمية لازم تكون Divide & Conquer.',
+   examples:[{in:'mergeSort([5,2,8,1,9,3])', out:'[1,2,3,5,8,9]'}]},
+];
+
+let currentProblem = null;
+let currentFilter = 'all';
+
+function diffColor(d){
+  return d==='easy'?'var(--green)':d==='medium'?'var(--orange)':d==='hard'?'var(--red)':'var(--purple)';
+}
+function diffLabel(d){
+  return d==='easy'?'🟢 سهل':d==='medium'?'🟡 متوسط':d==='hard'?'🔴 صعب':'💀 مستحيل';
+}
+
+function getSolvedProblems(){
+  try{ return JSON.parse(localStorage.getItem('solved_problems')||'[]'); }catch(e){ return []; }
+}
+
+function renderProblems(){
+  const solved = getSolvedProblems();
+  const list = document.getElementById('problemsList');
+  const filtered = currentFilter==='all'?PROBLEMS:PROBLEMS.filter(p=>p.difficulty===currentFilter);
+  list.innerHTML = filtered.map(p=>{
+    const isSolved = solved.includes(p.id);
+    return `<div class="card" style="border-right:4px solid ${diffColor(p.difficulty)};cursor:pointer;transition:transform .15s,box-shadow .15s;${isSolved?'opacity:.7':''}"
+      onmouseenter="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 30px rgba(0,0,0,.4)'"
+      onmouseleave="this.style.transform='';this.style.boxShadow=''"
+      onclick="openProblem('${p.id}')">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="font-size:1.4rem;">${isSolved?'✅':'🔒'}</div>
+          <div>
+            <div style="font-weight:900;font-size:1rem;">${p.title}</div>
+            <div style="font-size:.78rem;color:${diffColor(p.difficulty)};margin-top:2px;">${diffLabel(p.difficulty)}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3);border-radius:8px;padding:6px 14px;font-size:.85rem;font-weight:900;color:var(--orange);">
+            ⭐ ${p.points} نقطة
+          </div>
+          <div class="btn btn-ghost btn-sm">${isSolved?'مراجعة':'حل المسألة →'}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterProblems(f, btn){
+  currentFilter = f;
+  document.querySelectorAll('.prob-filter').forEach(b=>{
+    b.className = 'btn btn-ghost btn-sm prob-filter';
+  });
+  if(btn){ btn.classList.remove('btn-ghost'); btn.classList.add('btn-primary'); }
+  renderProblems();
+}
+
+function openProblem(id){
+  if(!window._currentUser){ 
+    showToast('⚠️ سجّل دخول الأول!','error');
+    openAuthModal('login');
+    return; 
+  }
+  const p = PROBLEMS.find(x=>x.id===id);
+  if(!p) return;
+  currentProblem = p;
+  document.getElementById('pmDiff').innerHTML = `<span style="color:${diffColor(p.difficulty)}">${diffLabel(p.difficulty)}</span>`;
+  document.getElementById('pmTitle').textContent = p.title;
+  document.getElementById('pmPoints').textContent = `⭐ ${p.points} نقطة`;
+  document.getElementById('pmDesc').textContent = p.desc;
+  document.getElementById('pmExamples').innerHTML = p.examples.map(ex=>`
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:8px;font-family:var(--font-mono);font-size:.83rem;">
+      <span style="color:var(--muted);">Input: </span><span style="color:var(--blue);">${ex.in}</span>
+      <span style="color:var(--muted);margin-right:12px;">Output: </span><span style="color:var(--green);">${ex.out}</span>
+    </div>`).join('');
+  document.getElementById('pmAnswer').value = '';
+  document.getElementById('pmResult').style.display = 'none';
+  document.getElementById('problemModal').style.display = 'flex';
+}
+
+function closeProblemModal(){
+  document.getElementById('problemModal').style.display = 'none';
+}
+
+async function submitProblem(){
+  const answer = document.getElementById('pmAnswer').value.trim();
+  if(!answer){ showToast('⚠️ اكتب إجابتك الأول!','error'); return; }
+  const solved = getSolvedProblems();
+  if(solved.includes(currentProblem.id)){
+    showToast('✅ أنت حليت المسألة دي قبل كده!','success');
+    closeProblemModal(); return;
+  }
+  const btn = document.getElementById('pmSubmitBtn');
+  btn.disabled = true; btn.textContent = '...جاري التحقق';
+  // حفظ الإجابة مؤقتاً (بدون AI دلوقتي)
+  solved.push(currentProblem.id);
+  localStorage.setItem('solved_problems', JSON.stringify(solved));
+  // تحديث النقاط في Supabase
+  if(window._sb && window._currentUser){
+    const uid = window._currentUser.id;
+    const {data} = await window._sb.from('profiles').select('points,solved').eq('id',uid).single();
+    if(data){
+      await window._sb.from('profiles').update({
+        points: (data.points||0) + currentProblem.points,
+        solved: (data.solved||0) + 1,
+        last_solve: new Date().toISOString()
+      }).eq('id', uid);
+    }
+  }
+  const res = document.getElementById('pmResult');
+  res.style.display = 'block';
+  res.innerHTML = `<div style="background:rgba(34,211,122,.1);border:1px solid rgba(34,211,122,.3);border-radius:10px;padding:16px;text-align:center;">
+    <div style="font-size:1.5rem;margin-bottom:6px;">🎉</div>
+    <div style="font-weight:900;color:var(--green);font-size:1rem;">تم تسجيل إجابتك!</div>
+    <div style="color:var(--muted);font-size:.85rem;margin-top:4px;">+${currentProblem.points} نقطة اتضافت لحسابك ⭐</div>
+  </div>`;
+  btn.disabled = false; btn.textContent = '✅ سلّم الإجابة';
+  renderProblems();
+  showToast(`🎉 +${currentProblem.points} نقطة!`, 'success');
+}
+
+/* ══════════════════════════════════
+   LEADERBOARD
+══════════════════════════════════ */
+async function loadLeaderboard(type){
+  document.querySelectorAll('.lb-tab').forEach(b=>{
+    b.className = 'btn btn-ghost lb-tab';
+  });
+  const activeTab = document.getElementById('lbTab'+type.charAt(0).toUpperCase()+type.slice(1));
+  if(activeTab){ activeTab.className = 'btn btn-primary lb-tab'; }
+  const list = document.getElementById('leaderboardList');
+  list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:40px;">⏳ جاري التحميل...</div>';
+  if(!window._sb){ list.innerHTML='<div style="text-align:center;color:var(--muted);padding:40px;">تسجيل الدخول مطلوب</div>'; return; }
+  let query = window._sb.from('profiles').select('name,points,solved').order('points',{ascending:false}).limit(20);
+  if(type==='daily'){
+    const today = new Date(); today.setHours(0,0,0,0);
+    query = window._sb.from('profiles').select('name,points,solved').gte('last_solve',today.toISOString()).order('points',{ascending:false}).limit(20);
+  } else if(type==='weekly'){
+    const week = new Date(); week.setDate(week.getDate()-7);
+    query = window._sb.from('profiles').select('name,points,solved').gte('last_solve',week.toISOString()).order('points',{ascending:false}).limit(20);
+  }
+  const {data,error} = await query;
+  if(error||!data||data.length===0){
+    list.innerHTML='<div style="text-align:center;color:var(--muted);padding:40px;">لا يوجد بيانات بعد — كن أول واحد! 🚀</div>';
+    return;
+  }
+  const medals = ['🥇','🥈','🥉'];
+  list.innerHTML = data.map((u,i)=>{
+    const av = makeAvatar(u.name||'?', u.avatar_url||null, 42);
+    return `
+    <div style="background:var(--surface);border:1px solid ${i<3?'rgba(245,166,35,.35)':'var(--border)'};border-radius:14px;padding:14px 20px;display:flex;align-items:center;gap:14px;transition:transform .15s,box-shadow .15s;"
+      onmouseenter="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 30px rgba(0,0,0,.4)'"
+      onmouseleave="this.style.transform='';this.style.boxShadow=''">
+      <div style="font-size:1.4rem;width:32px;text-align:center;flex-shrink:0;">${medals[i]||'#'+(i+1)}</div>
+      ${av}
+      <div style="flex:1;">
+        <div style="font-weight:900;font-size:.95rem;">${u.name||'مجهول'}</div>
+        <div style="font-size:.75rem;color:var(--muted);margin-top:2px;">✅ حل ${u.solved||0} مسألة</div>
+      </div>
+      <div style="background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3);border-radius:10px;padding:8px 16px;font-weight:900;color:var(--orange);font-size:.95rem;">⭐ ${u.points||0}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════
+   PROFILE
+══════════════════════════════════ */
+async function renderProfile(){
+  const el = document.getElementById('profileContent');
+  if(!window._currentUser){
+    el.innerHTML = `
+      <div style="text-align:center;padding:80px 24px;">
+        <div style="font-size:4rem;margin-bottom:16px;">👤</div>
+        <div style="font-size:1.3rem;font-weight:900;margin-bottom:8px;">مش مسجل دخول</div>
+        <div style="color:var(--muted);margin-bottom:24px;">سجّل دخول عشان تشوف البروفايل بتاعك</div>
+        <button class="btn btn-primary" onclick="openAuthModal('login')" style="padding:12px 32px;">🚀 دخول / تسجيل</button>
+      </div>`;
+    return;
+  }
+  const user = window._currentUser;
+  const name = user.user_metadata?.name || user.email.split('@')[0];
+  const solved = getSolvedProblems();
+  const avatarUrl = localStorage.getItem('avatar_' + user.id);
+  let dbData = {points:0, solved:0};
+  if(window._sb){
+    const {data} = await window._sb.from('profiles').select('*').eq('id',user.id).single();
+    if(data) dbData = data;
+  }
+  const totalPoints = PROBLEMS.reduce((s,p)=>s+p.points,0);
+  const pct = Math.round(((dbData.points||0)/totalPoints)*100);
+  el.innerHTML = `
+    <div class="page-header">
+      <div class="page-icon" style="background:rgba(79,142,247,.12);border:1px solid rgba(79,142,247,.3);">👤</div>
+      <div><div class="page-title">بروفايلك</div><div class="page-sub">شوف تقدمك ونقاطك</div></div>
+    </div>
+
+    <!-- بطاقة البروفايل -->
+    <div class="card" style="border-right:4px solid var(--blue);margin-bottom:20px;">
+      <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+        <!-- الأفاتار -->
+        <div style="position:relative;flex-shrink:0;cursor:pointer;" onclick="document.getElementById('avatarInput').click()">
+          ${avatarUrl
+            ? `<img src="${avatarUrl}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--blue);">`
+            : `<div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:grid;place-items:center;font-size:2.2rem;font-weight:900;color:white;border:3px solid var(--blue);">${name.charAt(0).toUpperCase()}</div>`
+          }
+          <div style="position:absolute;bottom:2px;left:2px;background:var(--surface);border:2px solid var(--border2);border-radius:50%;width:24px;height:24px;display:grid;place-items:center;font-size:.75rem;">📷</div>
+        </div>
+        <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="uploadAvatar(this)">
+        <div style="flex:1;">
+          <div style="font-size:1.3rem;font-weight:900;">${name}</div>
+          <div style="color:var(--muted);font-size:.83rem;margin-top:2px;">${user.email}</div>
+          <div style="font-size:.75rem;color:var(--muted);margin-top:4px;">اضغط على الصورة لتغييرها 📷</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="logoutUser()">🚪 خروج</button>
+      </div>
+    </div>
+
+    <!-- الإحصائيات -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:20px;">
+      <div class="card" style="text-align:center;padding:20px;">
+        <div style="font-size:2rem;font-weight:900;color:var(--orange);">⭐ ${dbData.points||0}</div>
+        <div style="font-size:.78rem;color:var(--muted);margin-top:4px;">إجمالي النقاط</div>
+      </div>
+      <div class="card" style="text-align:center;padding:20px;">
+        <div style="font-size:2rem;font-weight:900;color:var(--green);">✅ ${dbData.solved||0}</div>
+        <div style="font-size:.78rem;color:var(--muted);margin-top:4px;">مسائل محلولة</div>
+      </div>
+      <div class="card" style="text-align:center;padding:20px;">
+        <div style="font-size:2rem;font-weight:900;color:var(--blue);">📊 ${pct}%</div>
+        <div style="font-size:.78rem;color:var(--muted);margin-top:4px;">من الكل</div>
+      </div>
+      <div class="card" style="text-align:center;padding:20px;">
+        <div style="font-size:2rem;font-weight:900;color:var(--purple);">🧩 ${PROBLEMS.length}</div>
+        <div style="font-size:.78rem;color:var(--muted);margin-top:4px;">إجمالي التحديات</div>
+      </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="card" style="margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+        <span style="font-weight:900;">تقدمك الكلي</span>
+        <span style="color:var(--orange);font-weight:900;">${dbData.points||0} / ${totalPoints} نقطة</span>
+      </div>
+      <div style="height:12px;background:var(--surface3);border-radius:99px;overflow:hidden;">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--blue),var(--purple));border-radius:99px;transition:width 1.2s ease;"></div>
+      </div>
+      <div style="font-size:.75rem;color:var(--muted);margin-top:6px;">${pct}% مكتمل</div>
+    </div>
+
+    <!-- المسائل المحلولة -->
+    <div class="card">
+      <div class="card-title">المسائل المحلولة</div>
+      ${PROBLEMS.map(p=>{
+        const done = solved.includes(p.id);
+        return `<div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);">
+          <span style="font-size:1.1rem;">${done?'✅':'⬜'}</span>
+          <span style="flex:1;font-size:.88rem;${done?'':'color:var(--muted);'}">${p.title}</span>
+          <span style="font-size:.75rem;padding:2px 8px;border-radius:6px;background:${done?'rgba(34,211,122,.1)':'var(--surface2)'};color:${diffColor(p.difficulty)};">${diffLabel(p.difficulty)}</span>
+          <span style="font-size:.78rem;color:var(--orange);font-weight:700;">${done?'+'+p.points+'⭐':p.points+'⭐'}</span>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+window.uploadAvatar = function(input) {
+  const file = input.files[0];
+  if(!file || !window._currentUser) return;
+  if(file.size > 2*1024*1024){ showToast('⚠️ الصورة أكبر من 2MB','error'); return; }
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const base64 = e.target.result;
+    localStorage.setItem('avatar_' + window._currentUser.id, base64);
+    // تحديث الـ navbar
+    updateLoginBtn(window._currentUser);
+    // إعادة رسم البروفايل
+    renderProfile();
+    showToast('✅ تم تحديث الصورة!', 'success');
+  };
+  reader.readAsDataURL(file);
+};
+
 
 /* ══════════════════════════════════
    PAGE 1: IMAGES → PDF

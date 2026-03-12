@@ -133,7 +133,7 @@
     if (!loginBtn) return;
     if (user) {
       const name = user.user_metadata?.name || user.email.split('@')[0];
-      const avatarUrl = localStorage.getItem('avatar_' + user.id);
+      const avatarUrl = localStorage.getItem('avatar_' + user.id) || null;
       const av = typeof makeAvatar === 'function'
         ? makeAvatar(name, avatarUrl, 26)
         : '<span style="font-size:1.1rem;">👤</span>';
@@ -170,6 +170,53 @@
   window._sb = sb;
   window._supabaseReady = true;
 </script>
+
+<script>
+
+/* ══════════════════════════════════
+   AI JUDGE — OpenRouter Config
+   ⚠️ ضع الـ API Key الجديد هنا ↓
+══════════════════════════════════ */
+const AI_CONFIG = {
+  apiKey: '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', // ← ضع الـ Key هنا
+  model: 'openai/o4-mini',
+  url: 'https://openrouter.ai/api/v1/chat/completions'
+};
+
+async function judgeWithAI(problem, answer) {
+  if(!AI_CONFIG.apiKey || AI_CONFIG.apiKey === 'YOUR_OPENROUTER_KEY_HERE') {
+    // fallback بدون AI — يقبل أي إجابة
+    return { verdict: 'accepted', feedback: '✅ تم تسجيل إجابتك! (بدون تحقق AI)', score: 10 };
+  }
+  const sys = 'انت قاضٍ Java. قيّم إجابة الطالب. اعطِ ردك بـ JSON فقط: {"verdict":"accepted" او "wrong" او "partial","feedback":"شرح قصير بالعربي","score":رقم_من_10}';
+  const prompt = 'المسألة: ' + problem + '\n\nاجابة الطالب:\n' + answer;
+  try {
+    const res = await fetch(AI_CONFIG.url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + AI_CONFIG.apiKey,
+        'HTTP-Referer': 'https://ashraf-alrashidi.github.io/AshrafTools/',
+        'X-Title': 'AshrafTools'
+      },
+      body: JSON.stringify({
+        model: AI_CONFIG.model,
+        messages: [{role:'system',content:sys},{role:'user',content:prompt}],
+        max_tokens: 300,
+        temperature: 0.1
+      })
+    });
+    const data = await res.json();
+    const text = data.choices?.[0]?.message?.content || '{}';
+    const clean = text.replace(/```json|```/g,'').trim();
+    return JSON.parse(clean);
+  } catch(e) {
+    console.error('AI Judge error:', e);
+    return { verdict: 'accepted', feedback: '✅ تم التسجيل! (تعذر التحقق AI)', score: 10 };
+  }
+}
+
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -188,6 +235,12 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);min-heigh
   background-image:
     radial-gradient(ellipse 80% 50% at 20% -10%,rgba(79,142,247,.08) 0%,transparent 60%),
     radial-gradient(ellipse 60% 40% at 80% 110%,rgba(166,108,255,.06) 0%,transparent 60%);}
+
+/* ══ LOADING DOTS ══ */
+.loading-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:currentColor;animation:ldot .7s infinite alternate;}
+.loading-dot:nth-child(2){animation-delay:.2s;}
+.loading-dot:nth-child(3){animation-delay:.4s;}
+@keyframes ldot{from{opacity:.2}to{opacity:1}}
 
 /* ══ NAV ══ */
 .nav{display:flex;align-items:center;background:rgba(15,21,32,.95);
@@ -1249,7 +1302,8 @@ placeholder="// 👋 أهلاً يا بشمهندس!
 <div class="toast" id="toast"></div>
 
 <script>
-const {jsPDF}=window.jspdf;
+
+const {jsPDF} = window.jspdf || {};
 
 /* ══ SIGNATURE ══ */
 const NAME='أشرووووف';
@@ -1260,7 +1314,7 @@ function makeSig(id){
 ['sig1','sig2','sig3','sig4','sig5','sig6','sig7','sig8'].forEach(makeSig);
 
 /* ══ TAB SWITCH ══ */
-function switchTab(id,btn){
+window.switchTab = function switchTab(id,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
@@ -1271,7 +1325,7 @@ function switchTab(id,btn){
   if(id==='leaderboard')loadLeaderboard('all');
   if(id==='profile')renderProfile();
   if(id==='keys')buildShortcuts();
-}
+};
 
 // اختصارات Ctrl+1..4 للتنقل بين الصفحات
 document.addEventListener('keydown',e=>{
@@ -1483,7 +1537,7 @@ function getSolvedProblems(){
   try{ return JSON.parse(localStorage.getItem('solved_problems')||'[]'); }catch(e){ return []; }
 }
 
-function renderProblems(){
+window.renderProblems = function renderProblems(){
   const solved = getSolvedProblems();
   const list = document.getElementById('problemsList');
   const filtered = currentFilter==='all'?PROBLEMS:PROBLEMS.filter(p=>p.difficulty===currentFilter);
@@ -1521,7 +1575,7 @@ function filterProblems(f, btn){
   renderProblems();
 }
 
-function openProblem(id){
+window.openProblem = function openProblem(id){
   if(!window._currentUser){ 
     showToast('⚠️ سجّل دخول الأول!','error');
     openAuthModal('login');
@@ -1544,7 +1598,7 @@ function openProblem(id){
   document.getElementById('problemModal').style.display = 'flex';
 }
 
-function closeProblemModal(){
+window.closeProblemModal = function closeProblemModal(){
   document.getElementById('problemModal').style.display = 'none';
 }
 
@@ -1557,40 +1611,73 @@ async function submitProblem(){
     closeProblemModal(); return;
   }
   const btn = document.getElementById('pmSubmitBtn');
-  btn.disabled = true; btn.textContent = '...جاري الحفظ';
+  const resEl = document.getElementById('pmResult');
+  btn.disabled = true;
+  btn.innerHTML = '<span style="display:inline-flex;gap:4px;align-items:center;"><span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span></span> جاري التحقق...';
 
-  // حفظ محلي
-  solved.push(currentProblem.id);
-  localStorage.setItem('solved_problems', JSON.stringify(solved));
+  // إظهار loading
+  resEl.style.display = 'block';
+  resEl.innerHTML = `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;color:var(--muted);">
+    <div style="margin-bottom:8px;">🤖 الـ AI بيحكم على إجابتك...</div>
+    <div style="font-size:.78rem;">ده ممكن ياخد ثانية أو اتنين</div>
+  </div>`;
 
-  // تحديث النقاط في Supabase
-  if(window._sb && window._currentUser){
-    try {
-      const uid = window._currentUser.id;
-      const {data: pData} = await window._sb.from('profiles').select('points,solved').eq('id',uid).maybeSingle();
-      const newPoints = (pData?.points||0) + currentProblem.points;
-      const newSolved = (pData?.solved||0) + 1;
-      await window._sb.from('profiles').upsert({
-        id: uid,
-        name: window._currentUser.user_metadata?.name || window._currentUser.email.split('@')[0],
-        email: window._currentUser.email,
-        points: newPoints,
-        solved: newSolved,
-        last_solve: new Date().toISOString()
-      });
-    } catch(e){ console.error('points update error',e); }
+  // تحقق AI
+  const judgment = await judgeWithAI(currentProblem.desc || currentProblem.title, answer);
+  const accepted = judgment.verdict === 'accepted' || judgment.verdict === 'partial';
+
+  if(accepted){
+    // حفظ محلي
+    solved.push(currentProblem.id);
+    localStorage.setItem('solved_problems', JSON.stringify(solved));
+
+    // تحديث Supabase
+    if(window._sb && window._currentUser){
+      try {
+        const uid = window._currentUser.id;
+        const {data: pData} = await window._sb.from('profiles').select('points,solved').eq('id',uid).maybeSingle();
+        const pts = judgment.verdict === 'partial' ? Math.floor(currentProblem.points * 0.5) : currentProblem.points;
+        await window._sb.from('profiles').upsert({
+          id: uid,
+          name: window._currentUser.user_metadata?.name || window._currentUser.email.split('@')[0],
+          email: window._currentUser.email,
+          points: (pData?.points||0) + pts,
+          solved: (pData?.solved||0) + 1,
+          last_solve: new Date().toISOString()
+        });
+        resEl.innerHTML = `<div style="background:rgba(34,211,122,.1);border:1px solid rgba(34,211,122,.3);border-radius:12px;padding:18px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <span style="font-size:1.8rem;">${judgment.verdict==='accepted'?'🎉':'⚠️'}</span>
+            <div>
+              <div style="font-weight:900;color:var(--green);font-size:1rem;">${judgment.verdict==='accepted'?'إجابة صحيحة!':'إجابة جزئية!'}</div>
+              <div style="font-size:.78rem;color:var(--orange);">+${pts} نقطة ⭐  |  تقييم: ${judgment.score}/10</div>
+            </div>
+          </div>
+          <div style="font-size:.85rem;line-height:1.7;color:var(--text);background:var(--surface3);border-radius:8px;padding:10px;">${judgment.feedback}</div>
+        </div>`;
+        showToast('🎉 +' + pts + ' نقطة!', 'success');
+      } catch(e){ console.error('points error',e); }
+    }
+  } else {
+    resEl.innerHTML = `<div style="background:rgba(240,90,90,.08);border:1px solid rgba(240,90,90,.25);border-radius:12px;padding:18px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span style="font-size:1.8rem;">❌</span>
+        <div>
+          <div style="font-weight:900;color:var(--red);font-size:1rem;">إجابة غلط</div>
+          <div style="font-size:.78rem;color:var(--muted);">حاول تاني! النقاط لسه موجودة</div>
+        </div>
+      </div>
+      <div style="font-size:.85rem;line-height:1.7;color:var(--text);background:var(--surface3);border-radius:8px;padding:10px;">${judgment.feedback}</div>
+    </div>`;
+    showToast('❌ إجابة غلط، حاول تاني!', 'error');
+    btn.disabled = false;
+    btn.textContent = '✅ سلّم الإجابة';
+    return;
   }
 
-  const res = document.getElementById('pmResult');
-  res.style.display = 'block';
-  res.innerHTML = `<div style="background:rgba(34,211,122,.1);border:1px solid rgba(34,211,122,.3);border-radius:10px;padding:16px;text-align:center;">
-    <div style="font-size:1.5rem;margin-bottom:6px;">🎉</div>
-    <div style="font-weight:900;color:var(--green);font-size:1rem;">تم تسجيل إجابتك!</div>
-    <div style="color:var(--muted);font-size:.85rem;margin-top:4px;">+${currentProblem.points} نقطة اتضافت لحسابك ⭐</div>
-  </div>`;
-  btn.disabled = false; btn.textContent = '✅ سلّم الإجابة';
+  btn.disabled = false;
+  btn.textContent = '✅ سلّم الإجابة';
   renderProblems();
-  showToast('🎉 +' + currentProblem.points + ' نقطة!', 'success');
 }
 
 /* ══════════════════════════════════
@@ -1613,43 +1700,55 @@ function getAvatar(user) {
    LEADERBOARD
 ══════════════════════════════════ */
 async function loadLeaderboard(type){
-  document.querySelectorAll('.lb-tab').forEach(b=>{
-    b.className = 'btn btn-ghost lb-tab';
-  });
-  const activeTab = document.getElementById('lbTab'+type.charAt(0).toUpperCase()+type.slice(1));
-  if(activeTab){ activeTab.className = 'btn btn-primary lb-tab'; }
-  const list = document.getElementById('leaderboardList');
-  list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:40px;">⏳ جاري التحميل...</div>';
-  if(!window._sb){ list.innerHTML='<div style="text-align:center;color:var(--muted);padding:40px;">تسجيل الدخول مطلوب</div>'; return; }
-  let query = window._sb.from('profiles').select('name,points,solved').order('points',{ascending:false}).limit(20);
-  if(type==='daily'){
-    const today = new Date(); today.setHours(0,0,0,0);
-    query = window._sb.from('profiles').select('name,points,solved').gte('last_solve',today.toISOString()).order('points',{ascending:false}).limit(20);
-  } else if(type==='weekly'){
-    const week = new Date(); week.setDate(week.getDate()-7);
-    query = window._sb.from('profiles').select('name,points,solved').gte('last_solve',week.toISOString()).order('points',{ascending:false}).limit(20);
-  }
-  const {data,error} = await query;
-  if(error||!data||data.length===0){
-    list.innerHTML='<div style="text-align:center;color:var(--muted);padding:40px;">لا يوجد بيانات بعد — كن أول واحد! 🚀</div>';
+  document.querySelectorAll('.lb-tab').forEach(b=>{ b.className='btn btn-ghost lb-tab'; });
+  const activeTab=document.getElementById('lbTab'+type.charAt(0).toUpperCase()+type.slice(1));
+  if(activeTab) activeTab.className='btn btn-primary lb-tab';
+  const list=document.getElementById('leaderboardList');
+  list.innerHTML='<div style="text-align:center;color:var(--muted);padding:50px;font-size:.9rem;">⏳ جاري التحميل...</div>';
+  if(!window._sb){
+    list.innerHTML='<div style="text-align:center;color:var(--muted);padding:50px;">🔐 سجّل دخول عشان تشوف المتصدرين</div>';
     return;
   }
-  const medals = ['🥇','🥈','🥉'];
-  list.innerHTML = data.map((u,i)=>{
-    const av = makeAvatar(u.name||'?', null, 42);
-    return `
-    <div style="background:var(--surface);border:1px solid ${i<3?'rgba(245,166,35,.35)':'var(--border)'};border-radius:14px;padding:14px 20px;display:flex;align-items:center;gap:14px;transition:transform .15s,box-shadow .15s;"
-      onmouseenter="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 30px rgba(0,0,0,.4)'"
-      onmouseleave="this.style.transform='';this.style.boxShadow=''">
-      <div style="font-size:1.4rem;width:32px;text-align:center;flex-shrink:0;">${medals[i]||'#'+(i+1)}</div>
-      ${av}
-      <div style="flex:1;">
-        <div style="font-weight:900;font-size:.95rem;">${u.name||'مجهول'}</div>
-        <div style="font-size:.75rem;color:var(--muted);margin-top:2px;">✅ حل ${u.solved||0} مسألة</div>
-      </div>
-      <div style="background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3);border-radius:10px;padding:8px 16px;font-weight:900;color:var(--orange);font-size:.95rem;">⭐ ${u.points||0}</div>
-    </div>`;
-  }).join('');
+  try {
+    let query=window._sb.from('profiles').select('name,email,points,solved,avatar_url').order('points',{ascending:false}).limit(20);
+    if(type==='daily'){
+      const today=new Date(); today.setHours(0,0,0,0);
+      query=window._sb.from('profiles').select('name,email,points,solved,avatar_url').gte('last_solve',today.toISOString()).order('points',{ascending:false}).limit(20);
+    } else if(type==='weekly'){
+      const week=new Date(); week.setDate(week.getDate()-7);
+      query=window._sb.from('profiles').select('name,email,points,solved,avatar_url').gte('last_solve',week.toISOString()).order('points',{ascending:false}).limit(20);
+    }
+    const {data,error}=await query;
+    if(error) throw error;
+    if(!data||data.length===0){
+      const typeAr={all:'لم يحل أحد بعد',daily:'لا أحد حل اليوم',weekly:'لا أحد حل هذا الأسبوع'};
+      list.innerHTML=`<div style="text-align:center;padding:60px 20px;">
+        <div style="font-size:3rem;margin-bottom:12px;">🏆</div>
+        <div style="font-weight:900;font-size:1rem;margin-bottom:6px;">${typeAr[type]||'لا يوجد بيانات'}</div>
+        <div style="color:var(--muted);font-size:.85rem;">كن أول واحد يتصدر! 🚀</div>
+      </div>`;
+      return;
+    }
+    const medals=['🥇','🥈','🥉'];
+    const myId=window._currentUser?.id;
+    list.innerHTML=data.map((u,i)=>{
+      const av=makeAvatar(u.name||'?', u.avatar_url||null, 42);
+      const isMe=window._currentUser && u.email===window._currentUser.email;
+      return `<div style="background:${isMe?'rgba(79,142,247,.06)':'var(--surface)'};border:1px solid ${i<3?'rgba(245,166,35,.35)':isMe?'rgba(79,142,247,.3)':'var(--border)'};border-radius:14px;padding:14px 20px;display:flex;align-items:center;gap:14px;transition:transform .15s,box-shadow .15s;"
+        onmouseenter="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 30px rgba(0,0,0,.4)'"
+        onmouseleave="this.style.transform='';this.style.boxShadow=''">
+        <div style="font-size:1.4rem;width:32px;text-align:center;flex-shrink:0;">${medals[i]||'<span style="font-size:.85rem;color:var(--muted);">#'+(i+1)+'</span>'}</div>
+        ${av}
+        <div style="flex:1;">
+          <div style="font-weight:900;font-size:.95rem;">${u.name||'مجهول'} ${isMe?'<span style="font-size:.65rem;background:rgba(79,142,247,.15);color:var(--blue);border-radius:4px;padding:1px 6px;">أنت</span>':''}</div>
+          <div style="font-size:.75rem;color:var(--muted);margin-top:2px;">✅ حل ${u.solved||0} مسألة</div>
+        </div>
+        <div style="background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3);border-radius:10px;padding:8px 16px;font-weight:900;color:var(--orange);font-size:.95rem;">⭐ ${u.points||0}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    list.innerHTML=`<div style="text-align:center;color:var(--red);padding:40px;">❌ خطأ: ${e.message}</div>`;
+  }
 }
 
 /* ══════════════════════════════════
@@ -1670,11 +1769,16 @@ async function renderProfile(){
   const user = window._currentUser;
   const name = user.user_metadata?.name || user.email.split('@')[0];
   const solved = getSolvedProblems();
-  const avatarUrl = localStorage.getItem('avatar_' + user.id);
   let dbData = {points:0, solved:0};
   if(window._sb){
     const {data} = await window._sb.from('profiles').select('*').eq('id',user.id).maybeSingle();
     if(data) dbData = data;
+  }
+  // جيب الصورة من localStorage أو من Supabase
+  let avatarUrl = localStorage.getItem('avatar_' + user.id);
+  if(!avatarUrl && dbData?.avatar_url) {
+    avatarUrl = dbData.avatar_url;
+    localStorage.setItem('avatar_' + user.id, avatarUrl);
   }
   const totalPoints = PROBLEMS.reduce((s,p)=>s+p.points,0);
   const pct = Math.round(((dbData.points||0)/totalPoints)*100);
@@ -1761,11 +1865,18 @@ window.uploadAvatar = function(input) {
   reader.onload = async (e) => {
     const base64 = e.target.result;
     localStorage.setItem('avatar_' + window._currentUser.id, base64);
-    // تحديث الـ navbar
+    if(window._sb) {
+      try {
+        await window._sb.from('profiles').update({ avatar_url: base64 }).eq('id', window._currentUser.id);
+        showToast('✅ تم حفظ الصورة!', 'success');
+      } catch(err) {
+        showToast('✅ تم الحفظ محلياً', 'success');
+      }
+    } else {
+      showToast('✅ تم تحديث الصورة!', 'success');
+    }
     updateLoginBtn(window._currentUser);
-    // إعادة رسم البروفايل
     renderProfile();
-    showToast('✅ تم تحديث الصورة!', 'success');
   };
   reader.readAsDataURL(file);
 };
@@ -2346,6 +2457,7 @@ function showToast(msg,type=''){
   const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+(type||'');
   void t.offsetWidth;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200);
 }
+
 </script>
 </body>
 </html>

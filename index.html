@@ -178,13 +178,22 @@
    ⚠️ ضع الـ API Key الجديد هنا ↓
 ══════════════════════════════════ */
 const AI_CONFIG = {
-  apiKey: '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', // ← ضع الـ Key هنا
   model: 'openai/o4-mini',
-  url: 'https://openrouter.ai/api/v1/chat/completions'
+  url: 'https://openrouter.ai/api/v1/chat/completions',
+  apiKey: ''
 };
 
+// جيب الـ Key من Supabase عند التحميل
+async function loadApiKey() {
+  try {
+    const { data } = await sb.from('settings').select('value').eq('key','openrouter_key').maybeSingle();
+    if(data?.value) AI_CONFIG.apiKey = data.value;
+  } catch(e) { console.warn('Could not load API key', e); }
+}
+loadApiKey();
+
 async function judgeWithAI(problem, answer) {
-  if(!AI_CONFIG.apiKey || AI_CONFIG.apiKey === 'YOUR_OPENROUTER_KEY_HERE') {
+  if(!AI_CONFIG.apiKey) {
     // fallback بدون AI — يقبل أي إجابة
     return { verdict: 'accepted', feedback: '✅ تم تسجيل إجابتك! (بدون تحقق AI)', score: 10 };
   }
@@ -516,6 +525,9 @@ label.flabel{display:block;font-size:.7rem;font-weight:700;color:var(--muted);te
     style="margin-right:auto;margin-left:8px;flex-shrink:0;padding:7px 14px;font-size:.8rem;">
     🚀 دخول / تسجيل
   </button>
+  <button onclick="openApiKeyModal()" title="إعدادات AI Key"
+    style="flex-shrink:0;background:var(--surface2);border:1px solid var(--border);border-radius:10px;width:36px;height:36px;cursor:pointer;font-size:1rem;display:grid;place-items:center;transition:all .2s;"
+    onmouseenter="this.style.borderColor='var(--orange)'" onmouseleave="this.style.borderColor='var(--border)'">⚙️</button>
   <div style="display:flex;align-items:center;gap:6px;padding:0 16px;flex-shrink:0;border-right:1px solid var(--border);">
 
     <span style="font-size:1rem;">👁️</span>
@@ -2458,6 +2470,61 @@ function showToast(msg,type=''){
   void t.offsetWidth;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200);
 }
 
+
+/* ══ API KEY MODAL ══ */
+function openApiKeyModal() {
+  const modal = document.getElementById('apiKeyModal');
+  modal.style.display = 'flex';
+  const saved = localStorage.getItem('or_api_key') || '';
+  const inp = document.getElementById('apiKeyInput');
+  inp.value = saved;
+  const st = document.getElementById('apiKeyStatus');
+  st.textContent = saved ? '✅ Key محفوظ — الـ AI Judge شغال' : '⚠️ مفيش Key — هيقبل أي إجابة بدون تحقق';
+  st.style.color = saved ? 'var(--green)' : 'var(--orange)';
+}
+function closeApiKeyModal() {
+  document.getElementById('apiKeyModal').style.display = 'none';
+}
+function saveApiKey() {
+  const val = document.getElementById('apiKeyInput').value.trim();
+  if(!val) { showToast('⚠️ ادخل الـ Key الأول!','error'); return; }
+  localStorage.setItem('or_api_key', val);
+  showToast('✅ تم حفظ الـ Key!','success');
+  closeApiKeyModal();
+}
+function clearApiKey() {
+  localStorage.removeItem('or_api_key');
+  document.getElementById('apiKeyInput').value = '';
+  showToast('🗑️ تم حذف الـ Key','success');
+  closeApiKeyModal();
+}
+document.getElementById('apiKeyModal')?.addEventListener('click', function(e){
+  if(e.target === this) closeApiKeyModal();
+});
+
 </script>
+
+<!-- ══ API KEY MODAL ══ -->
+<div id="apiKeyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9000;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:460px;animation:fadeUp .3s ease;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div style="font-size:1.1rem;font-weight:900;">⚙️ إعدادات AI Judge</div>
+      <button onclick="closeApiKeyModal()" style="background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer;">✕</button>
+    </div>
+    <div style="font-size:.82rem;color:var(--muted);margin-bottom:16px;line-height:1.7;">
+      عشان الـ AI Judge يشتغل محتاج <strong style="color:var(--orange);">OpenRouter API Key</strong> مجاني.<br>
+      اعمل حساب على <a href="https://openrouter.ai/keys" target="_blank" style="color:var(--blue);">openrouter.ai/keys</a> واعمل Key جديد.
+    </div>
+    <div style="margin-bottom:6px;font-size:.82rem;font-weight:700;color:var(--muted);">الـ API KEY</div>
+    <input type="password" id="apiKeyInput" placeholder="sk-or-v1-..." 
+      style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--text);font-family:var(--mono);font-size:.85rem;outline:none;margin-bottom:16px;"
+      onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='var(--border)'">
+    <div style="display:flex;gap:10px;">
+      <button onclick="saveApiKey()" style="flex:1;background:linear-gradient(135deg,var(--orange),#f06040);border:none;border-radius:10px;padding:12px;color:white;font-family:var(--font);font-weight:900;cursor:pointer;font-size:.9rem;">💾 حفظ</button>
+      <button onclick="clearApiKey()" style="background:rgba(240,90,90,.1);border:1px solid rgba(240,90,90,.2);border-radius:10px;padding:12px 16px;color:var(--red);font-family:var(--font);font-weight:700;cursor:pointer;font-size:.85rem;">🗑️ حذف</button>
+    </div>
+    <div id="apiKeyStatus" style="margin-top:12px;font-size:.8rem;text-align:center;min-height:18px;"></div>
+  </div>
+</div>
 </body>
 </html>

@@ -517,7 +517,7 @@ label.flabel{display:block;font-size:.7rem;font-weight:700;color:var(--muted);te
   <button class="tab-btn" onclick="switchTab('guide',this)" style="color:var(--orange);border-bottom-color:transparent;">📖 دليل الاستخدام</button>
   <button class="tab-btn" onclick="switchTab('keys',this)" style="color:var(--cyan);border-bottom-color:transparent;">⌨️ الاختصارات</button>
   <button class="tab-btn" onclick="switchTab('problems',this)">🧩 تحديات
-    <span class="tab-badge" style="background:var(--orange);">10</span>
+    <span class="tab-badge" style="background:var(--orange);">30</span>
   </button>
   <button class="tab-btn" onclick="switchTab('leaderboard',this)">🏆 المتصدرون</button>
   <button class="tab-btn" onclick="switchTab('profile',this)">👤 بروفايل</button>
@@ -525,9 +525,7 @@ label.flabel{display:block;font-size:.7rem;font-weight:700;color:var(--muted);te
     style="margin-right:auto;margin-left:8px;flex-shrink:0;padding:7px 14px;font-size:.8rem;">
     🚀 دخول / تسجيل
   </button>
-  <button onclick="openApiKeyModal()" title="إعدادات AI Key"
-    style="flex-shrink:0;background:var(--surface2);border:1px solid var(--border);border-radius:10px;width:36px;height:36px;cursor:pointer;font-size:1rem;display:grid;place-items:center;transition:all .2s;"
-    onmouseenter="this.style.borderColor='var(--orange)'" onmouseleave="this.style.borderColor='var(--border)'">⚙️</button>
+
   <div style="display:flex;align-items:center;gap:6px;padding:0 16px;flex-shrink:0;border-right:1px solid var(--border);">
 
     <span style="font-size:1rem;">👁️</span>
@@ -1503,6 +1501,7 @@ function buildShortcuts() {
    PROBLEMS DATA
 ══════════════════════════════════ */
 const PROBLEMS = [
+  // ══ EASY ══
   {id:'p1', title:'مجموع الأرقام', difficulty:'easy', points:10,
    desc:'اكتب دالة تستقبل رقمين وترجع مجموعهم.',
    examples:[{in:'add(3, 5)', out:'8'},{in:'add(-1, 4)', out:'3'}]},
@@ -1512,27 +1511,95 @@ const PROBLEMS = [
   {id:'p3', title:'عكس النص', difficulty:'easy', points:15,
    desc:'اكتب دالة تستقبل String وترجعه معكوس.',
    examples:[{in:'reverse("hello")', out:'"olleh"'},{in:'reverse("java")', out:'"avaj"'}]},
-  {id:'p4', title:'الفيبوناتشي', difficulty:'medium', points:30,
+  {id:'p4', title:'أكبر عدد في Array', difficulty:'easy', points:10,
+   desc:'اكتب دالة تستقبل int array وترجع أكبر رقم فيه.',
+   examples:[{in:'max(new int[]{3,7,1,9,2})', out:'9'},{in:'max(new int[]{-1,-5,-2})', out:'-1'}]},
+  {id:'p5', title:'عد الحروف', difficulty:'easy', points:10,
+   desc:'اكتب دالة تستقبل String وحرف، وترجع عدد مرات ظهور الحرف في النص.',
+   examples:[{in:'count("hello", "l")', out:'2'},{in:'count("java", "a")', out:'2'}]},
+  {id:'p6', title:'مجموع أرقام Array', difficulty:'easy', points:10,
+   desc:'اكتب دالة تستقبل int array وترجع مجموع كل عناصره.',
+   examples:[{in:'sum(new int[]{1,2,3,4,5})', out:'15'},{in:'sum(new int[]{-1,1})', out:'0'}]},
+  {id:'p7', title:'هل النص فارغ؟', difficulty:'easy', points:10,
+   desc:'اكتب دالة تستقبل String وترجع true لو فارغ أو null، وfalse لو فيه محتوى.',
+   examples:[{in:'isEmpty("")', out:'true'},{in:'isEmpty("hello")', out:'false'}]},
+  {id:'p8', title:'تحويل درجات الحرارة', difficulty:'easy', points:15,
+   desc:'اكتب دالة تحوّل درجة الحرارة من Celsius لـ Fahrenheit. المعادلة: F = C * 9/5 + 32',
+   examples:[{in:'toFahrenheit(0)', out:'32.0'},{in:'toFahrenheit(100)', out:'212.0'}]},
+  {id:'p9', title:'هل الرقم أولي؟', difficulty:'easy', points:15,
+   desc:'اكتب دالة تستقبل رقم وترجع true لو أولي (prime) وfalse لو لأ.',
+   examples:[{in:'isPrime(7)', out:'true'},{in:'isPrime(9)', out:'false'}]},
+  {id:'p10', title:'قلب الأرقام', difficulty:'easy', points:15,
+   desc:'اكتب دالة تستقبل عدد صحيح وترجعه معكوس الأرقام.',
+   examples:[{in:'reverseNum(1234)', out:'4321'},{in:'reverseNum(100)', out:'1'}]},
+
+  // ══ MEDIUM ══
+  {id:'p11', title:'الفيبوناتشي', difficulty:'medium', points:30,
    desc:'اكتب دالة تطبع أول N رقم في سلسلة فيبوناتشي. السلسلة: 0, 1, 1, 2, 3, 5, 8, ...',
    examples:[{in:'fib(5)', out:'0 1 1 2 3'},{in:'fib(7)', out:'0 1 1 2 3 5 8'}]},
-  {id:'p5', title:'الباليندروم', difficulty:'medium', points:30,
+  {id:'p12', title:'الباليندروم', difficulty:'medium', points:30,
    desc:'اكتب دالة تتحقق لو الكلمة palindrome (تُقرأ بنفس الطريقة من الاتجاهين). ارجع true أو false.',
    examples:[{in:'isPalindrome("racecar")', out:'true'},{in:'isPalindrome("hello")', out:'false'}]},
-  {id:'p6', title:'الفاكتوريال', difficulty:'medium', points:35,
+  {id:'p13', title:'الفاكتوريال', difficulty:'medium', points:35,
    desc:'اكتب دالة recursive تحسب factorial لرقم N. تذكر: factorial(0) = 1',
    examples:[{in:'factorial(5)', out:'120'},{in:'factorial(0)', out:'1'}]},
-  {id:'p7', title:'Binary Search', difficulty:'hard', points:60,
+  {id:'p14', title:'ترتيب Bubble Sort', difficulty:'medium', points:30,
+   desc:'نفّذ خوارزمية Bubble Sort لترتيب int array تصاعدياً.',
+   examples:[{in:'bubbleSort(new int[]{5,3,8,1})', out:'[1, 3, 5, 8]'},{in:'bubbleSort(new int[]{2,1})', out:'[1, 2]'}]},
+  {id:'p15', title:'HashMap — تكرار الكلمات', difficulty:'medium', points:35,
+   desc:'اكتب برنامج يستقبل جملة ويطبع عدد مرات تكرار كل كلمة باستخدام HashMap.',
+   examples:[{in:'"hello world hello"', out:'hello=2, world=1'}]},
+  {id:'p16', title:'مصفوفة مقلوبة', difficulty:'medium', points:30,
+   desc:'اكتب دالة تعكس ترتيب عناصر int array في نفس المصفوفة (in-place) بدون مصفوفة جديدة.',
+   examples:[{in:'reverse(new int[]{1,2,3,4,5})', out:'[5, 4, 3, 2, 1]'}]},
+  {id:'p17', title:'أكبر عدد مشترك — GCD', difficulty:'medium', points:35,
+   desc:'اكتب دالة recursive تحسب القاسم المشترك الأكبر (GCD) لعددين باستخدام خوارزمية Euclidean.',
+   examples:[{in:'gcd(48, 18)', out:'6'},{in:'gcd(100, 75)', out:'25'}]},
+  {id:'p18', title:'Queue بـ LinkedList', difficulty:'medium', points:40,
+   desc:'نفّذ Queue بـ Java LinkedList فيها: enqueue(), dequeue(), peek(), isEmpty().',
+   examples:[{in:'enqueue(1),enqueue(2),dequeue()', out:'1'},{in:'peek()', out:'2'}]},
+  {id:'p19', title:'String — عكس الكلمات', difficulty:'medium', points:30,
+   desc:'اكتب دالة تستقبل جملة وتعكس ترتيب الكلمات (مش الحروف).',
+   examples:[{in:'reverseWords("Hello World Java")', out:'"Java World Hello"'}]},
+  {id:'p20', title:'المصفوفة الثنائية — بحث', difficulty:'medium', points:40,
+   desc:'اعمل 2D array 3x3 وابحث عن قيمة معينة، ارجع [row, col] أو [-1,-1] لو مش موجودة.',
+   examples:[{in:'find(matrix, 5)', out:'[1, 2]'},{in:'find(matrix, 99)', out:'[-1, -1]'}]},
+
+  // ══ HARD ══
+  {id:'p21', title:'Binary Search', difficulty:'hard', points:60,
    desc:'نفّذ خوارزمية Binary Search على array مرتب. ارجع index العنصر أو -1 لو مش موجود.',
-   examples:[{in:'search([1,3,5,7,9], 5)', out:'2'},{in:'search([1,3,5], 4)', out:'-1'}]},
-  {id:'p8', title:'Linked List — إضافة وطباعة', difficulty:'hard', points:70,
+   examples:[{in:'search(new int[]{1,3,5,7,9}, 5)', out:'2'},{in:'search(new int[]{1,3,5}, 4)', out:'-1'}]},
+  {id:'p22', title:'Linked List — إضافة وطباعة', difficulty:'hard', points:70,
    desc:'اعمل Linked List في Java فيها: addFirst(), addLast(), printList(). اكتب الكلاسين Node و LinkedList.',
    examples:[{in:'addFirst(1), addLast(2), addLast(3), printList()', out:'1 -> 2 -> 3'}]},
-  {id:'p9', title:'Stack بـ Array', difficulty:'hard', points:75,
-   desc:'نفّذ Stack باستخدام Array فيها: push(), pop(), peek(), isEmpty(). تعامل مع حالة الـ overflow و underflow.',
+  {id:'p23', title:'Stack بـ Array', difficulty:'hard', points:75,
+   desc:'نفّذ Stack باستخدام Array فيها: push(), pop(), peek(), isEmpty(). تعامل مع الـ overflow و underflow.',
    examples:[{in:'push(1),push(2),pop()', out:'2'},{in:'peek()', out:'1'}]},
-  {id:'p10', title:'Merge Sort', difficulty:'impossible', points:150,
+  {id:'p24', title:'Binary Tree — إدراج وطباعة', difficulty:'hard', points:80,
+   desc:'نفّذ Binary Search Tree فيها: insert() و inOrder(). اكتب الكلاسين Node و BST.',
+   examples:[{in:'insert(5),insert(3),insert(7), inOrder()', out:'3 5 7'}]},
+  {id:'p25', title:'Recursion — Tower of Hanoi', difficulty:'hard', points:70,
+   desc:'اكتب برنامج recursive يحل لغز Tower of Hanoi لـ N قرص. اطبع كل حركة.',
+   examples:[{in:'hanoi(3, "A", "C", "B")', out:'Move disk 1 from A to C
+Move disk 2 from A to B
+...'}]},
+  {id:'p26', title:'Design Pattern — Singleton', difficulty:'hard', points:65,
+   desc:'نفّذ Singleton Design Pattern في Java. الكلاس لازم يكون Thread-Safe باستخدام synchronized.',
+   examples:[{in:'getInstance() == getInstance()', out:'true — نفس الـ object'}]},
+  {id:'p27', title:'Exception Handling كامل', difficulty:'hard', points:60,
+   desc:'اكتب برنامج يقرأ رقم من المستخدم ويقسم 100 عليه. تعامل مع: NumberFormatException و ArithmeticException واكتب finally block.',
+   examples:[{in:'input: 0', out:'ArithmeticException: Cannot divide by zero'},{in:'input: 5', out:'Result: 20'}]},
+
+  // ══ IMPOSSIBLE ══
+  {id:'p28', title:'Merge Sort', difficulty:'impossible', points:150,
    desc:'نفّذ خوارزمية Merge Sort كاملة. اكتب الدالتين: mergeSort() و merge(). الخوارزمية لازم تكون Divide & Conquer.',
-   examples:[{in:'mergeSort([5,2,8,1,9,3])', out:'[1,2,3,5,8,9]'}]},
+   examples:[{in:'mergeSort(new int[]{5,2,8,1,9,3})', out:'[1, 2, 3, 5, 8, 9]'}]},
+  {id:'p29', title:'Graph — BFS', difficulty:'impossible', points:180,
+   desc:'نفّذ Breadth-First Search على Graph ممثّل بـ Adjacency List. اطبع الـ nodes بترتيب الزيارة.',
+   examples:[{in:'BFS(graph, 0)', out:'0 1 2 3 4'}]},
+  {id:'p30', title:'LRU Cache', difficulty:'impossible', points:200,
+   desc:'نفّذ LRU (Least Recently Used) Cache بـ Java باستخدام LinkedHashMap أو Doubly Linked List + HashMap. فيها: get(key) و put(key, value) بـ O(1).',
+   examples:[{in:'put(1,1),put(2,2),get(1),put(3,3),get(2)', out:'1, -1 (evicted)'}]},
 ];
 
 let currentProblem = null;
